@@ -42,3 +42,32 @@ export const weeklyInsights = pgTable(
 
 export type WeeklyInsight = typeof weeklyInsights.$inferSelect;
 export type NewWeeklyInsight = typeof weeklyInsights.$inferInsert;
+
+export type MbtiScores = {
+  EI: number;
+  SN: number;
+  TF: number;
+  JP: number;
+};
+
+export const mbtiSnapshots = pgTable(
+  'mbti_snapshots',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: text('user_id').notNull(),
+    snapshotDate: date('snapshot_date').notNull(),
+    scores: jsonb('scores').notNull().$type<MbtiScores>(),
+    sourceEntryIds: jsonb('source_entry_ids').notNull().$type<string[]>(),
+    model: text('model').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    userDateUnique: uniqueIndex('mbti_snapshots_user_date_unique').on(
+      table.userId,
+      table.snapshotDate,
+    ),
+  }),
+);
+
+export type MbtiSnapshot = typeof mbtiSnapshots.$inferSelect;
+export type NewMbtiSnapshot = typeof mbtiSnapshots.$inferInsert;
