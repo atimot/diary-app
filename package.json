@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",
-    "db:verify": "tsx --env-file=.env.local scripts/verify-db.ts"
+    "db:verify": "tsx --env-file=.env.local scripts/verify-db.ts",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
