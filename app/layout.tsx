@@ -40,6 +40,12 @@ export default function RootLayout({
             >
               履歴
             </Link>
+            <Link
+              href="/insights"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              分析
+            </Link>
           </nav>
         </header>
         {children}
