@@ -2,7 +2,7 @@ import { listDiaryEntries } from '@/lib/db/queries/diary';
 import { getLatestInsight } from '@/lib/db/queries/insight';
 import { getLatestMbtiSnapshot } from '@/lib/db/queries/mbti';
 import { RegenerateButton } from '@/components/insights/RegenerateButton';
-import { MBTIRadar } from '@/components/insights/MBTIRadar';
+import { MBTISliders } from '@/components/insights/MBTISliders';
 import type { MbtiScores } from '@/lib/db/schema';
 
 const MIN_ENTRIES = 7;
@@ -95,7 +95,7 @@ export default async function InsightsPage() {
               占いではなく、最近7日分の日記から AI が読み取った参考的な傾向
             </p>
           </div>
-          <MBTIRadar scores={mbti.scores as MbtiScores} />
+          <MBTISliders scores={mbti.scores as MbtiScores} />
         </section>
       )}
 
