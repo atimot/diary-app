@@ -1,0 +1,33 @@
+// scripts/seed-reset.ts
+import { Pool } from '@neondatabase/serverless';
+
+const USER_ID = process.env.DEFAULT_USER_ID ?? 'me';
+
+async function main() {
+  if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL is not set in .env.local');
+    process.exit(1);
+  }
+
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+  const insights = await pool.query(
+    'DELETE FROM weekly_insights WHERE user_id = $1',
+    [USER_ID],
+  );
+  const entries = await pool.query(
+    'DELETE FROM diary_entries WHERE user_id = $1',
+    [USER_ID],
+  );
+
+  await pool.end();
+
+  console.log(
+    `✅ Deleted ${insights.rowCount} weekly_insights and ${entries.rowCount} diary_entries for user "${USER_ID}"`,
+  );
+}
+
+main().catch((err) => {
+  console.error('❌ Reset failed:', err);
+  process.exit(1);
+});

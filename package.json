@@ -10,7 +10,9 @@
     "format": "biome format --write",
     "db:verify": "tsx --env-file=.env.local scripts/verify-db.ts",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx --env-file=.env.local scripts/seed.ts",
+    "db:seed:reset": "tsx --env-file=.env.local scripts/seed-reset.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.80",
