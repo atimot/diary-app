@@ -1,6 +1,9 @@
 import { listDiaryEntries } from '@/lib/db/queries/diary';
 import { getLatestInsight } from '@/lib/db/queries/insight';
+import { getLatestMbtiSnapshot } from '@/lib/db/queries/mbti';
 import { RegenerateButton } from '@/components/insights/RegenerateButton';
+import { MBTIRadar } from '@/components/insights/MBTIRadar';
+import type { MbtiScores } from '@/lib/db/schema';
 
 const MIN_ENTRIES = 7;
 
@@ -16,12 +19,13 @@ function formatDateTime(value: Date): string {
 }
 
 export default async function InsightsPage() {
-  const [entries, insight] = await Promise.all([
+  const [entries, insight, mbti] = await Promise.all([
     listDiaryEntries(),
     getLatestInsight(),
+    getLatestMbtiSnapshot(),
   ]);
 
-  // 件数不足 → empty state
+  // state 1: 件数不足
   if (entries.length < MIN_ENTRIES) {
     const remaining = MIN_ENTRIES - entries.length;
     return (
@@ -35,8 +39,8 @@ export default async function InsightsPage() {
     );
   }
 
-  // 件数は足りているが、まだ生成していない → 初回生成ボタン
-  if (!insight) {
+  // state 2: 件数は足りているが、insight も mbti もまだ生成していない
+  if (!insight && !mbti) {
     return (
       <main className="container mx-auto max-w-3xl p-6">
         <h1 className="mb-6 text-2xl font-bold">あなたの傾向</h1>
@@ -49,27 +53,51 @@ export default async function InsightsPage() {
     );
   }
 
-  // キャッシュあり → 表示 + 再生成ボタン
+  // state 3: 少なくとも片方のキャッシュあり
   return (
-    <main className="container mx-auto max-w-3xl space-y-8 p-6">
+    <main className="container mx-auto max-w-3xl space-y-10 p-6">
       <header>
         <h1 className="text-2xl font-bold">あなたの傾向</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {insight.periodStart} 〜 {insight.periodEnd} の日記{' '}
-          {Array.isArray(insight.sourceEntryIds) ? insight.sourceEntryIds.length : 0}{' '}
-          件から · {formatDateTime(insight.createdAt)} に生成
-        </p>
+        {insight && (
+          <p className="mt-1 text-sm text-muted-foreground">
+            {insight.periodStart}{' '}〜 {insight.periodEnd} の日記{' '}
+            {Array.isArray(insight.sourceEntryIds)
+              ? insight.sourceEntryIds.length
+              : 0}{' '}
+            件から · {formatDateTime(insight.createdAt)} に生成
+          </p>
+        )}
       </header>
 
-      <section className="space-y-2">
-        <h2 className="text-lg font-semibold">最近のあなたの動向</h2>
-        <p className="whitespace-pre-wrap leading-relaxed">{insight.summary}</p>
-      </section>
+      {insight && (
+        <>
+          <section className="space-y-2">
+            <h2 className="text-lg font-semibold">最近のあなたの動向</h2>
+            <p className="whitespace-pre-wrap leading-relaxed">
+              {insight.summary}
+            </p>
+          </section>
 
-      <section className="space-y-2">
-        <h2 className="text-lg font-semibold">ワンポイントアドバイス</h2>
-        <p className="whitespace-pre-wrap leading-relaxed">{insight.advice}</p>
-      </section>
+          <section className="space-y-2">
+            <h2 className="text-lg font-semibold">ワンポイントアドバイス</h2>
+            <p className="whitespace-pre-wrap leading-relaxed">
+              {insight.advice}
+            </p>
+          </section>
+        </>
+      )}
+
+      {mbti && (
+        <section className="space-y-3">
+          <div>
+            <h2 className="text-lg font-semibold">MBTI 傾向</h2>
+            <p className="text-xs text-muted-foreground">
+              占いではなく、最近7日分の日記から AI が読み取った参考的な傾向
+            </p>
+          </div>
+          <MBTIRadar scores={mbti.scores as MbtiScores} />
+        </section>
+      )}
 
       <footer className="border-t pt-4">
         <RegenerateButton label="再生成する" pendingLabel="分析中…" />
