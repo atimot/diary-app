@@ -36,11 +36,11 @@ function cellClasses(args: {
       'bg-primary text-primary-foreground font-medium hover:opacity-90 transition';
     return cell.isToday ? `${base} ${tone} ring-2 ring-foreground/40` : `${base} ${tone}`;
   }
-  // Past day without an entry
+  // Past day without an entry (now clickable for backdate)
   if (cell.isToday) {
     return `${base} ring-2 ring-primary text-foreground hover:bg-accent transition`;
   }
-  return `${base} text-muted-foreground`;
+  return `${base} text-muted-foreground hover:bg-accent transition`;
 }
 
 function DayCell({ cell, written }: { cell: CalendarCell; written: boolean }) {
@@ -80,7 +80,16 @@ function DayCell({ cell, written }: { cell: CalendarCell; written: boolean }) {
     );
   }
 
-  return <div className={className}>{cell.day}</div>;
+  // Past day without an entry — clickable to backdate
+  return (
+    <Link
+      href={`/diary/${cell.iso}`}
+      className={className}
+      aria-label={`${cell.iso} に日記を書く`}
+    >
+      {cell.day}
+    </Link>
+  );
 }
 
 export function DiaryCalendar({
