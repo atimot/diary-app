@@ -1,6 +1,7 @@
 // app/history/page.tsx
 import { listDiaryEntries } from '@/lib/db/queries/diary';
 import { DiaryCalendar } from '@/components/diary/DiaryCalendar';
+import { computeStreak } from '@/lib/diary/streak';
 import {
   formatYearMonth,
   parseYearMonth,
@@ -25,10 +26,21 @@ export default async function HistoryPage({ searchParams }: PageProps) {
 
   const entries = await listDiaryEntries();
   const writtenDates = new Set(entries.map((e) => e.entryDate));
+  const streak = computeStreak(
+    entries.map((e) => e.entryDate),
+    today,
+  );
 
   return (
     <main className="container mx-auto max-w-3xl p-6">
-      <h1 className="mb-6 text-2xl font-bold">日記の履歴</h1>
+      <div className="mb-6 flex flex-wrap items-baseline gap-3">
+        <h1 className="text-2xl font-bold">日記の履歴</h1>
+        {streak > 0 && (
+          <span className="rounded-full bg-accent px-3 py-1 text-sm font-medium">
+            🔥 {streak}日連続記入中
+          </span>
+        )}
+      </div>
       <DiaryCalendar
         year={year}
         month={month}

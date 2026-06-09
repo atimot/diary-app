@@ -3,6 +3,17 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,17 +33,21 @@ export function DiaryEditor({
 }: DiaryEditorProps) {
   const router = useRouter();
   const [content, setContent] = useState(initialContent);
+  const [activeTab, setActiveTab] = useState<'edit' | 'preview'>(defaultTab);
   const [isSavePending, startSaveTransition] = useTransition();
   const [isDeletePending, startDeleteTransition] = useTransition();
-  const [feedback, setFeedback] = useState<
-    { kind: 'success' | 'error'; message: string } | null
-  >(null);
+  const [feedback, setFeedback] = useState<{
+    kind: 'success' | 'error';
+    message: string;
+  } | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleAction = (formData: FormData) => {
     startSaveTransition(async () => {
       const result = await saveDiaryEntry(formData);
       if (result.ok) {
         setFeedback({ kind: 'success', message: '保存しました' });
+        setActiveTab('preview');
       } else {
         setFeedback({ kind: 'error', message: result.error });
       }
@@ -40,12 +55,12 @@ export function DiaryEditor({
   };
 
   const handleDelete = () => {
-    if (!window.confirm('この日記を削除しますか？')) return;
     startDeleteTransition(async () => {
       const result = await deleteDiaryEntry(entryDate);
       if (result.ok) {
         router.push('/');
       } else {
+        setConfirmOpen(false);
         setFeedback({ kind: 'error', message: result.error });
       }
     });
@@ -60,7 +75,11 @@ export function DiaryEditor({
       <input type="hidden" name="entryDate" value={entryDate} />
       <input type="hidden" name="content" value={content} />
 
-      <Tabs defaultValue={defaultTab} className="w-full">
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as 'edit' | 'preview')}
+        className="w-full"
+      >
         <TabsList>
           <TabsTrigger value="edit">編集</TabsTrigger>
           <TabsTrigger value="preview">プレビュー</TabsTrigger>
@@ -84,18 +103,52 @@ export function DiaryEditor({
       </Tabs>
 
       <div className="flex items-center gap-3">
-        <Button type="submit" disabled={isPending || content.trim().length === 0}>
+        <Button
+          type="submit"
+          disabled={isPending || content.trim().length === 0}
+        >
           {isSavePending ? '保存中…' : '保存'}
         </Button>
         {canDelete && (
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={isPending}
+          <AlertDialog
+            open={confirmOpen}
+            onOpenChange={(open) => {
+              if (isDeletePending) return;
+              setConfirmOpen(open);
+            }}
           >
-            {isDeletePending ? '削除中…' : '削除'}
-          </Button>
+            <AlertDialogTrigger
+              render={
+                <Button
+                  type="button"
+                  variant="destructive"
+                  disabled={isPending}
+                >
+                  削除
+                </Button>
+              }
+            />
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>この日記を削除しますか？</AlertDialogTitle>
+                <AlertDialogDescription>
+                  削除すると元に戻すことはできません。
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isDeletePending}>
+                  キャンセル
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={isDeletePending}
+                >
+                  {isDeletePending ? '削除中…' : '削除'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )}
         {feedback && (
           <span
