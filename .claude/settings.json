@@ -2,7 +2,14 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "defaultMode": "acceptEdits",
-    "allow": ["Bash"],
+    "allow": [
+      "Bash",
+      "mcp__plugin_context7_context7__*",
+      "mcp__plugin_chrome-devtools-mcp_chrome-devtools__*",
+      "mcp__plugin_playwright_playwright__*",
+      "mcp__claude-in-chrome__*",
+      "mcp__claude_ai_Notion__*"
+    ],
     "deny": [
       "Bash(rm -rf*)",
       "Bash(sudo *)",
