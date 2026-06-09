@@ -1,6 +1,7 @@
 // lib/actions/diary.ts
 'use server';
 
+import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db/client';
 import { diaryEntries } from '@/lib/db/schema';
@@ -46,5 +47,30 @@ export async function saveDiaryEntry(formData: FormData): Promise<SaveResult> {
   } catch (err) {
     console.error('Failed to save diary entry:', err);
     return { ok: false, error: '保存に失敗しました' };
+  }
+}
+
+export type DeleteResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
+export async function deleteDiaryEntry(entryDate: string): Promise<DeleteResult> {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(entryDate)) {
+    return { ok: false, error: '日付の形式が不正です' };
+  }
+
+  try {
+    await db
+      .delete(diaryEntries)
+      .where(and(eq(diaryEntries.userId, USER_ID), eq(diaryEntries.entryDate, entryDate)));
+
+    revalidatePath('/');
+    revalidatePath('/history');
+    revalidatePath(`/diary/${entryDate}`);
+
+    return { ok: true };
+  } catch (err) {
+    console.error('Failed to delete diary entry:', err);
+    return { ok: false, error: '削除に失敗しました' };
   }
 }
