@@ -1,28 +1,35 @@
 // app/page.tsx
 import { DiaryEditor } from '@/components/diary/DiaryEditor';
-import { getDiaryEntry } from '@/lib/db/queries/diary';
-
-function todayInTokyo(): string {
-  const fmt = new Intl.DateTimeFormat('ja-JP', {
-    timeZone: 'Asia/Tokyo',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-  const parts = fmt.formatToParts(new Date());
-  const get = (type: Intl.DateTimeFormatPartTypes) =>
-    parts.find((p) => p.type === type)?.value ?? '';
-  return `${get('year')}-${get('month')}-${get('day')}`;
-}
+import { getDiaryEntry, listDiaryEntries } from '@/lib/db/queries/diary';
+import { computeStreak } from '@/lib/diary/streak';
+import { todayInTokyo } from '@/lib/calendar/month-grid';
 
 export default async function HomePage() {
   const date = todayInTokyo();
-  const existing = await getDiaryEntry(date);
+  const [existing, allEntries] = await Promise.all([
+    getDiaryEntry(date),
+    listDiaryEntries(),
+  ]);
+  const streak = computeStreak(
+    allEntries.map((e) => e.entryDate),
+    date,
+  );
 
   return (
     <main className="container mx-auto max-w-3xl p-6">
-      <h1 className="mb-6 text-2xl font-bold">{date} の日記</h1>
-      <DiaryEditor entryDate={date} initialContent={existing?.content ?? ''} />
+      <div className="mb-6 flex flex-wrap items-baseline gap-3">
+        <h1 className="text-2xl font-bold">{date} の日記</h1>
+        {streak > 0 && (
+          <span className="rounded-full bg-accent px-3 py-1 text-sm font-medium">
+            🔥 {streak}日連続記入中
+          </span>
+        )}
+      </div>
+      <DiaryEditor
+        entryDate={date}
+        initialContent={existing?.content ?? ''}
+        defaultTab="edit"
+      />
     </main>
   );
 }
