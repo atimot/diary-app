@@ -18,6 +18,10 @@ updates:
       # （AGENTS.md「npm lockfile と CI」参照）。単独の major bump は無意味なので除外。
       - dependency-name: "@emnapi/*"
         update-types: ["version-update:semver-major"]
+      # @types/node はランタイム（Node 24: CI の setup-node / Vercel デフォルト）の major に
+      # 合わせる。ランタイムを上げるときに手動で bump する。
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "chore(deps)"
   - package-ecosystem: github-actions
