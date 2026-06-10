@@ -21,5 +21,21 @@
   },
   "enabledPlugins": {
     "vercel@claude-plugins-official": true
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run lint && npx tsc --noEmit",
+            "if": "Bash(git commit*)",
+            "timeout": 120,
+            "statusMessage": "Running biome + tsc before commit..."
+          }
+        ]
+      }
+    ]
   }
 }
