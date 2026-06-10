@@ -40,13 +40,13 @@
   "overrides": {
     "@emnapi/core": "1.10.0",
     "@emnapi/runtime": "1.10.0",
-    "@emnapi/wasi-threads": "1.2.1"
+    "@emnapi/wasi-threads": "2.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
     "@emnapi/core": "1.10.0",
     "@emnapi/runtime": "1.10.0",
-    "@emnapi/wasi-threads": "1.2.1",
+    "@emnapi/wasi-threads": "2.0.0",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^20",
