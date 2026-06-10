@@ -79,6 +79,7 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 - マージ後は `git checkout main && git pull` で追従する。
 - CI の build はダミー env（`.github/workflows/ci.yml` 参照）で走る。本物の secret を CI に追加しない。
 - main へのマージで Vercel が本番に auto-deploy する（M4 と同じ）。
+- 依存更新は Dependabot（週次・月曜朝）+ `/dependabot` コマンドで処理する。手順の詳細は `.claude/commands/dependabot.md` を参照。
 
 ## 個人試作の運用前提
 - 単一ユーザー（`tmd6031@gmail.com`）。`ALLOWED_EMAILS` に追加する形で運用する。

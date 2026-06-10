@@ -67,7 +67,7 @@ updates:
 3. 判定:
    - 問題なし → `gh pr merge --squash --delete-branch`
    - 懸念あり(breaking の影響が確認できた、CI red の原因が更新自体、等)→ マージせず理由つきで報告し、ユーザーの判断を仰ぐ。
-4. 全件処理後: `git checkout main && git pull`、本番 URL(https://diary-app-atimot.vercel.app)の生存確認(HTTP 200)、マージ件数・スキップ件数・スキップ理由のサマリ報告。
+4. 全件処理後: `git checkout main && git pull`、最新 production デプロイの Ready 確認(本番 URL は Vercel Deployment Protection により 401 が正常応答のため、HTTP 200 ではなくデプロイ状態で判定)、マージ件数・スキップ件数・スキップ理由のサマリ報告。
 
 ### 3. AGENTS.md への追記
 
