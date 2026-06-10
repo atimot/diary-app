@@ -43,7 +43,9 @@ export function formatYearMonth(year: number, month: number): string {
   return `${year}-${pad2(month)}`;
 }
 
-export function parseYearMonth(ym: string): { year: number; month: number } | null {
+export function parseYearMonth(
+  ym: string,
+): { year: number; month: number } | null {
   const m = /^(\d{4})-(\d{2})$/.exec(ym);
   if (!m) return null;
   const year = Number(m[1]);
@@ -52,12 +54,18 @@ export function parseYearMonth(ym: string): { year: number; month: number } | nu
   return { year, month };
 }
 
-export function prevMonth(year: number, month: number): { year: number; month: number } {
+export function prevMonth(
+  year: number,
+  month: number,
+): { year: number; month: number } {
   if (month === 1) return { year: year - 1, month: 12 };
   return { year, month: month - 1 };
 }
 
-export function nextMonth(year: number, month: number): { year: number; month: number } {
+export function nextMonth(
+  year: number,
+  month: number,
+): { year: number; month: number } {
   if (month === 12) return { year: year + 1, month: 1 };
   return { year, month: month + 1 };
 }
@@ -67,7 +75,11 @@ export function nextMonth(year: number, month: number): { year: number; month: n
  * Week starts on Sunday (Japanese convention).
  * Padding from previous/next month fills incomplete weeks.
  */
-export function buildMonthGrid(year: number, month: number, today: string): MonthGrid {
+export function buildMonthGrid(
+  year: number,
+  month: number,
+  today: string,
+): MonthGrid {
   const firstOfMonth = new Date(Date.UTC(year, month - 1, 1));
   const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
   const firstWeekday = firstOfMonth.getUTCDay(); // 0 = Sunday

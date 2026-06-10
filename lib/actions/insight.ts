@@ -2,17 +2,15 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { generateCombinedInsight } from '@/lib/ai/combined-insight';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@/lib/db/client';
-import { weeklyInsights, mbtiSnapshots } from '@/lib/db/schema';
 import { listDiaryEntries } from '@/lib/db/queries/diary';
-import { generateCombinedInsight } from '@/lib/ai/combined-insight';
+import { mbtiSnapshots, weeklyInsights } from '@/lib/db/schema';
 
 const MIN_ENTRIES = 7;
 
-export type RegenerateResult =
-  | { ok: true }
-  | { ok: false; error: string };
+export type RegenerateResult = { ok: true } | { ok: false; error: string };
 
 /**
  * Gemini / AI SDK の 429 (rate limit) エラーを識別する。
@@ -105,7 +103,8 @@ export async function regenerateInsight(): Promise<RegenerateResult> {
     }
     return {
       ok: false,
-      error: '分析の生成に失敗しました。しばらく経ってからもう一度お試しください。',
+      error:
+        '分析の生成に失敗しました。しばらく経ってからもう一度お試しください。',
     };
   }
 }

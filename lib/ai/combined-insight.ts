@@ -7,8 +7,8 @@
 import { generateText, Output } from 'ai';
 import { defaultModel, defaultModelId } from '@/lib/ai/client';
 import {
-  combinedInsightOutputSchema,
   type CombinedInsightOutput,
+  combinedInsightOutputSchema,
 } from '@/lib/ai/schemas/combined-insight';
 import type { DiaryEntry } from '@/lib/db/schema';
 

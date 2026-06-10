@@ -2,9 +2,11 @@
 import { desc, eq } from 'drizzle-orm';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@/lib/db/client';
-import { mbtiSnapshots, type MbtiSnapshot } from '@/lib/db/schema';
+import { type MbtiSnapshot, mbtiSnapshots } from '@/lib/db/schema';
 
-export async function getLatestMbtiSnapshot(): Promise<MbtiSnapshot | undefined> {
+export async function getLatestMbtiSnapshot(): Promise<
+  MbtiSnapshot | undefined
+> {
   const session = await requireSession();
   const userId = session.user.id;
   const rows = await db

@@ -1,14 +1,26 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { signOut, useSession } from '@/lib/auth/client';
 
 const links = [
-  { href: '/', label: '日記', match: (p: string) => p === '/' || p.startsWith('/diary') },
-  { href: '/history', label: '履歴', match: (p: string) => p.startsWith('/history') },
-  { href: '/insights', label: '分析', match: (p: string) => p.startsWith('/insights') },
+  {
+    href: '/',
+    label: '日記',
+    match: (p: string) => p === '/' || p.startsWith('/diary'),
+  },
+  {
+    href: '/history',
+    label: '履歴',
+    match: (p: string) => p.startsWith('/history'),
+  },
+  {
+    href: '/insights',
+    label: '分析',
+    match: (p: string) => p.startsWith('/insights'),
+  },
 ];
 
 export function HeaderNav() {
@@ -47,7 +59,12 @@ export function HeaderNav() {
       {session?.user && (
         <div className="flex items-center gap-3 text-sm">
           <span className="text-muted-foreground">{session.user.email}</span>
-          <Button type="button" variant="outline" size="sm" onClick={handleSignOut}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleSignOut}
+          >
             サインアウト
           </Button>
         </div>

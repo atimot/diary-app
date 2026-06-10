@@ -1,7 +1,7 @@
 // app/page.tsx
 import { DiaryEditor } from '@/components/diary/DiaryEditor';
-import { getDiaryEntry } from '@/lib/db/queries/diary';
 import { todayInTokyo } from '@/lib/calendar/month-grid';
+import { getDiaryEntry } from '@/lib/db/queries/diary';
 
 export default async function HomePage() {
   const date = todayInTokyo();

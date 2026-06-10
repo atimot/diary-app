@@ -468,12 +468,18 @@ async function main() {
   const count = arg ? Number.parseInt(arg, 10) : 7;
 
   if (!Number.isFinite(count) || count <= 0) {
-    console.error('Usage: pnpm db:seed [count]   (count: 1-' + sampleEntries.length + ', default 7)');
+    console.error(
+      'Usage: pnpm db:seed [count]   (count: 1-' +
+        sampleEntries.length +
+        ', default 7)',
+    );
     process.exit(1);
   }
 
   if (count > sampleEntries.length) {
-    console.error(`Max ${sampleEntries.length} entries available (requested ${count})`);
+    console.error(
+      `Max ${sampleEntries.length} entries available (requested ${count})`,
+    );
     process.exit(1);
   }
 

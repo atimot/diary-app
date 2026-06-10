@@ -1,8 +1,8 @@
 // app/diary/[date]/page.tsx
 import { notFound } from 'next/navigation';
 import { DiaryEditor } from '@/components/diary/DiaryEditor';
-import { getDiaryEntry } from '@/lib/db/queries/diary';
 import { todayInTokyo } from '@/lib/calendar/month-grid';
+import { getDiaryEntry } from '@/lib/db/queries/diary';
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 

@@ -1,8 +1,9 @@
 // components/diary/DiaryEditor.tsx
 'use client';
 
-import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
+import { DiaryMarkdown } from '@/components/diary/DiaryMarkdown';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +19,6 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { deleteDiaryEntry, saveDiaryEntry } from '@/lib/actions/diary';
-import { DiaryMarkdown } from '@/components/diary/DiaryMarkdown';
 
 interface DiaryEditorProps {
   entryDate: string;

@@ -31,7 +31,9 @@ function SignInContent() {
         </p>
       )}
       {error && error !== 'not_allowed' && (
-        <p className="text-sm text-destructive">サインインに失敗しました（{error}）。</p>
+        <p className="text-sm text-destructive">
+          サインインに失敗しました（{error}）。
+        </p>
       )}
     </main>
   );

@@ -17,7 +17,10 @@ function subDays(yyyymmdd: string, days: number): string {
   return `${y2}-${m2}-${d2}`;
 }
 
-export function computeStreak(entryDates: readonly string[], today: string): number {
+export function computeStreak(
+  entryDates: readonly string[],
+  today: string,
+): number {
   const dates = new Set(entryDates);
 
   // 起点: 今日が記入済みなら今日、未記入なら昨日

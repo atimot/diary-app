@@ -8,9 +8,7 @@ import { db } from '@/lib/db/client';
 import { diaryEntries } from '@/lib/db/schema';
 import { diaryEntrySchema } from '@/lib/validation/diary';
 
-export type SaveResult =
-  | { ok: true }
-  | { ok: false; error: string };
+export type SaveResult = { ok: true } | { ok: false; error: string };
 
 export async function saveDiaryEntry(formData: FormData): Promise<SaveResult> {
   const session = await requireSession();
@@ -22,7 +20,10 @@ export async function saveDiaryEntry(formData: FormData): Promise<SaveResult> {
   });
 
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? '入力が不正です' };
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message ?? '入力が不正です',
+    };
   }
 
   try {
@@ -52,11 +53,11 @@ export async function saveDiaryEntry(formData: FormData): Promise<SaveResult> {
   }
 }
 
-export type DeleteResult =
-  | { ok: true }
-  | { ok: false; error: string };
+export type DeleteResult = { ok: true } | { ok: false; error: string };
 
-export async function deleteDiaryEntry(entryDate: string): Promise<DeleteResult> {
+export async function deleteDiaryEntry(
+  entryDate: string,
+): Promise<DeleteResult> {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(entryDate)) {
     return { ok: false, error: '日付の形式が不正です' };
   }
@@ -67,7 +68,12 @@ export async function deleteDiaryEntry(entryDate: string): Promise<DeleteResult>
   try {
     await db
       .delete(diaryEntries)
-      .where(and(eq(diaryEntries.userId, userId), eq(diaryEntries.entryDate, entryDate)));
+      .where(
+        and(
+          eq(diaryEntries.userId, userId),
+          eq(diaryEntries.entryDate, entryDate),
+        ),
+      );
 
     revalidatePath('/');
     revalidatePath('/history');

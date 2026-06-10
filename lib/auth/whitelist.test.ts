@@ -3,19 +3,27 @@ import { isAllowedEmail, parseAllowList } from './whitelist';
 
 describe('isAllowedEmail', () => {
   it('returns true for exact match', () => {
-    expect(isAllowedEmail('daichi.tomita@vivion.jp', ['daichi.tomita@vivion.jp'])).toBe(true);
+    expect(
+      isAllowedEmail('daichi.tomita@vivion.jp', ['daichi.tomita@vivion.jp']),
+    ).toBe(true);
   });
 
   it('returns false for non-matching email', () => {
-    expect(isAllowedEmail('other@example.com', ['daichi.tomita@vivion.jp'])).toBe(false);
+    expect(
+      isAllowedEmail('other@example.com', ['daichi.tomita@vivion.jp']),
+    ).toBe(false);
   });
 
   it('is case-insensitive', () => {
-    expect(isAllowedEmail('DAICHI.tomita@VIVION.JP', ['daichi.tomita@vivion.jp'])).toBe(true);
+    expect(
+      isAllowedEmail('DAICHI.tomita@VIVION.JP', ['daichi.tomita@vivion.jp']),
+    ).toBe(true);
   });
 
   it('trims whitespace in allow list entries', () => {
-    expect(isAllowedEmail('foo@bar.com', [' foo@bar.com ', 'baz@bar.com'])).toBe(true);
+    expect(
+      isAllowedEmail('foo@bar.com', [' foo@bar.com ', 'baz@bar.com']),
+    ).toBe(true);
   });
 
   it('returns false for empty allow list', () => {

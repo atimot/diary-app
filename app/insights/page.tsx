@@ -1,8 +1,8 @@
+import { MBTISliders } from '@/components/insights/MBTISliders';
+import { RegenerateButton } from '@/components/insights/RegenerateButton';
 import { listDiaryEntries } from '@/lib/db/queries/diary';
 import { getLatestInsight } from '@/lib/db/queries/insight';
 import { getLatestMbtiSnapshot } from '@/lib/db/queries/mbti';
-import { RegenerateButton } from '@/components/insights/RegenerateButton';
-import { MBTISliders } from '@/components/insights/MBTISliders';
 import type { MbtiScores } from '@/lib/db/schema';
 
 const MIN_ENTRIES = 7;
@@ -45,8 +45,8 @@ export default async function InsightsPage() {
       <main className="container mx-auto max-w-3xl p-6">
         <h1 className="mb-6 text-2xl font-bold">あなたの傾向</h1>
         <p className="mb-4 text-muted-foreground">
-          日記が {entries.length}{' '}
-          件溜まりました。AI に最近の傾向を分析させてみましょう。
+          日記が {entries.length} 件溜まりました。AI
+          に最近の傾向を分析させてみましょう。
         </p>
         <RegenerateButton label="AI に分析させる" pendingLabel="分析中…" />
       </main>
@@ -60,7 +60,7 @@ export default async function InsightsPage() {
         <h1 className="text-2xl font-bold">あなたの傾向</h1>
         {insight && (
           <p className="mt-1 text-sm text-muted-foreground">
-            {insight.periodStart}{' '}〜 {insight.periodEnd} の日記{' '}
+            {insight.periodStart} 〜 {insight.periodEnd} の日記{' '}
             {Array.isArray(insight.sourceEntryIds)
               ? insight.sourceEntryIds.length
               : 0}{' '}

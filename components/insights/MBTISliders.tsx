@@ -15,13 +15,41 @@ interface MBTISlidersProps {
 }
 
 const AXES: AxisDef[] = [
-  { key: 'EI', leftLetter: 'I', leftName: '内向', rightLetter: 'E', rightName: '外向' },
-  { key: 'SN', leftLetter: 'S', leftName: '感覚', rightLetter: 'N', rightName: '直観' },
-  { key: 'TF', leftLetter: 'T', leftName: '思考', rightLetter: 'F', rightName: '感情' },
-  { key: 'JP', leftLetter: 'J', leftName: '判断', rightLetter: 'P', rightName: '知覚' },
+  {
+    key: 'EI',
+    leftLetter: 'I',
+    leftName: '内向',
+    rightLetter: 'E',
+    rightName: '外向',
+  },
+  {
+    key: 'SN',
+    leftLetter: 'S',
+    leftName: '感覚',
+    rightLetter: 'N',
+    rightName: '直観',
+  },
+  {
+    key: 'TF',
+    leftLetter: 'T',
+    leftName: '思考',
+    rightLetter: 'F',
+    rightName: '感情',
+  },
+  {
+    key: 'JP',
+    leftLetter: 'J',
+    leftName: '判断',
+    rightLetter: 'P',
+    rightName: '知覚',
+  },
 ];
 
-function leaningLabel(value: number, leftName: string, rightName: string): string {
+function leaningLabel(
+  value: number,
+  leftName: string,
+  rightName: string,
+): string {
   const abs = Math.abs(value);
   const target = value < 0 ? leftName : rightName;
   if (abs < 0.2) return 'ほぼ中間';

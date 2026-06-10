@@ -2,7 +2,7 @@
 import { desc, eq } from 'drizzle-orm';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@/lib/db/client';
-import { weeklyInsights, type WeeklyInsight } from '@/lib/db/schema';
+import { type WeeklyInsight, weeklyInsights } from '@/lib/db/schema';
 
 export async function getLatestInsight(): Promise<WeeklyInsight | undefined> {
   const session = await requireSession();

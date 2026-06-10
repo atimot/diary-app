@@ -2,10 +2,10 @@
 import Link from 'next/link';
 import {
   buildMonthGrid,
+  type CalendarCell,
   formatYearMonth,
   nextMonth,
   prevMonth,
-  type CalendarCell,
 } from '@/lib/calendar/month-grid';
 
 interface DiaryCalendarProps {
@@ -18,12 +18,10 @@ interface DiaryCalendarProps {
 
 const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土'];
 
-function cellClasses(args: {
-  cell: CalendarCell;
-  written: boolean;
-}): string {
+function cellClasses(args: { cell: CalendarCell; written: boolean }): string {
   const { cell, written } = args;
-  const base = 'aspect-square flex items-center justify-center rounded-md text-sm';
+  const base =
+    'aspect-square flex items-center justify-center rounded-md text-sm';
 
   if (!cell.inMonth) {
     return `${base} text-muted-foreground/30`;
@@ -34,7 +32,9 @@ function cellClasses(args: {
   if (written) {
     const tone =
       'bg-primary text-primary-foreground font-medium hover:opacity-90 transition';
-    return cell.isToday ? `${base} ${tone} ring-2 ring-foreground/40` : `${base} ${tone}`;
+    return cell.isToday
+      ? `${base} ${tone} ring-2 ring-foreground/40`
+      : `${base} ${tone}`;
   }
   // Past day without an entry (now clickable for backdate)
   if (cell.isToday) {
@@ -150,7 +150,11 @@ export function DiaryCalendar({
 
       <div className="grid grid-cols-7 gap-1">
         {grid.weeks.flat().map((cell) => (
-          <DayCell key={cell.iso} cell={cell} written={writtenDates.has(cell.iso)} />
+          <DayCell
+            key={cell.iso}
+            cell={cell}
+            written={writtenDates.has(cell.iso)}
+          />
         ))}
       </div>
 

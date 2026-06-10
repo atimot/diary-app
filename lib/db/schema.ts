@@ -1,5 +1,15 @@
 // lib/db/schema.ts
-import { pgTable, text, date, timestamp, uuid, uniqueIndex, jsonb, boolean, index } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  date,
+  index,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 // ---------------------------------------------------------------------------
 // Better Auth tables
@@ -11,8 +21,12 @@ export const user = pgTable('user', {
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').default(false).notNull(),
   image: text('image'),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 });
 
 export const session = pgTable(
@@ -21,8 +35,12 @@ export const session = pgTable(
     id: text('id').primaryKey(),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
     token: text('token').notNull().unique(),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
     ipAddress: text('ip_address'),
     userAgent: text('user_agent'),
     userId: text('user_id')
@@ -44,12 +62,20 @@ export const account = pgTable(
     accessToken: text('access_token'),
     refreshToken: text('refresh_token'),
     idToken: text('id_token'),
-    accessTokenExpiresAt: timestamp('access_token_expires_at', { withTimezone: true }),
-    refreshTokenExpiresAt: timestamp('refresh_token_expires_at', { withTimezone: true }),
+    accessTokenExpiresAt: timestamp('access_token_expires_at', {
+      withTimezone: true,
+    }),
+    refreshTokenExpiresAt: timestamp('refresh_token_expires_at', {
+      withTimezone: true,
+    }),
     scope: text('scope'),
     password: text('password'),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => [index('account_userId_idx').on(table.userId)],
 );
@@ -61,8 +87,12 @@ export const verification = pgTable(
     identifier: text('identifier').notNull(),
     value: text('value').notNull(),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => [index('verification_identifier_idx').on(table.identifier)],
 );
@@ -80,11 +110,18 @@ export const diaryEntries = pgTable(
       .references(() => user.id, { onDelete: 'cascade' }),
     entryDate: date('entry_date').notNull(),
     content: text('content').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => ({
-    userDateUnique: uniqueIndex('diary_entries_user_date_unique').on(table.userId, table.entryDate),
+    userDateUnique: uniqueIndex('diary_entries_user_date_unique').on(
+      table.userId,
+      table.entryDate,
+    ),
   }),
 );
 
@@ -104,7 +141,9 @@ export const weeklyInsights = pgTable(
     advice: text('advice').notNull(),
     sourceEntryIds: jsonb('source_entry_ids').notNull().$type<string[]>(),
     model: text('model').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => ({
     userPeriodUnique: uniqueIndex('weekly_insights_user_period_unique').on(
@@ -135,7 +174,9 @@ export const mbtiSnapshots = pgTable(
     scores: jsonb('scores').notNull().$type<MbtiScores>(),
     sourceEntryIds: jsonb('source_entry_ids').notNull().$type<string[]>(),
     model: text('model').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => ({
     userDateUnique: uniqueIndex('mbti_snapshots_user_date_unique').on(
