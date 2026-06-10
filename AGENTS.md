@@ -65,6 +65,13 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 - **対立軸 → 対立スライダー**（自前 Tailwind 実装）、**独立連続量（Big Five 等）→ Radar**、という棲み分け。
 - Recharts は試したが M3 で削除済み。再導入する場合は本当に Radar が必要なケースに限る。
 
+## 開発フロー（M5 以降: PR ベース）
+- **main へ直 push 不可**（ruleset で拒否される）。作業は必ずブランチで行い PR を作る。
+- PR 作成後、`gh pr checks --watch` で CI（lint / tsc / vitest / build）が green になるのを確認してから `gh pr merge --squash --delete-branch` でマージする。マージ方式は squash のみ。
+- マージ後は `git checkout main && git pull` で追従する。
+- CI の build はダミー env（`.github/workflows/ci.yml` 参照）で走る。本物の secret を CI に追加しない。
+- main へのマージで Vercel が本番に auto-deploy する（M4 と同じ）。
+
 ## 個人試作の運用前提
 - 単一ユーザー（`tmd6031@gmail.com`）。`ALLOWED_EMAILS` に追加する形で運用する。
 - Vercel Hobby plan。Preview デプロイは無効、Production 一本。
