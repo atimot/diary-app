@@ -4,7 +4,8 @@
   "buildCommand": "npm run build",
   "git": {
     "deploymentEnabled": {
-      "!(main)": false
+      "**": false,
+      "main": true
     }
   }
 }
