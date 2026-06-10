@@ -1,7 +1,13 @@
 // scripts/seed-reset.ts
 import { Pool } from '@neondatabase/serverless';
 
-const USER_ID = process.env.DEFAULT_USER_ID ?? 'me';
+const USER_ID = process.env.SEED_USER_ID;
+if (!USER_ID) {
+  console.error(
+    'SEED_USER_ID が未設定です。`SEED_USER_ID=<your-user-id> npm run db:seed:reset` で実行してください。',
+  );
+  process.exit(1);
+}
 
 async function main() {
   if (!process.env.DATABASE_URL) {

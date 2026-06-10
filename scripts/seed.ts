@@ -1,7 +1,13 @@
 // scripts/seed.ts
 import { Pool } from '@neondatabase/serverless';
 
-const USER_ID = process.env.DEFAULT_USER_ID ?? 'me';
+const USER_ID = process.env.SEED_USER_ID;
+if (!USER_ID) {
+  console.error(
+    'SEED_USER_ID が未設定です。`SEED_USER_ID=<your-user-id> npm run db:seed` で実行してください。',
+  );
+  process.exit(1);
+}
 
 // 30 substantial Japanese diary entries with Markdown formatting,
 // chronological oldest-to-newest order. Each entry is 3-5 paragraphs and
