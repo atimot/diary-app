@@ -2,12 +2,12 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { requireSession } from '@/lib/auth/session';
 import { db } from '@/lib/db/client';
 import { weeklyInsights, mbtiSnapshots } from '@/lib/db/schema';
 import { listDiaryEntries } from '@/lib/db/queries/diary';
 import { generateCombinedInsight } from '@/lib/ai/combined-insight';
 
-const USER_ID = process.env.DEFAULT_USER_ID ?? 'me';
 const MIN_ENTRIES = 7;
 
 export type RegenerateResult =
@@ -25,6 +25,9 @@ function isRateLimitError(err: unknown): boolean {
 
 export async function regenerateInsight(): Promise<RegenerateResult> {
   try {
+    const session = await requireSession();
+    const userId = session.user.id;
+
     const allEntries = await listDiaryEntries();
     if (allEntries.length < MIN_ENTRIES) {
       return {
@@ -50,7 +53,7 @@ export async function regenerateInsight(): Promise<RegenerateResult> {
       db
         .insert(weeklyInsights)
         .values({
-          userId: USER_ID,
+          userId,
           periodStart,
           periodEnd,
           summary,
@@ -72,7 +75,7 @@ export async function regenerateInsight(): Promise<RegenerateResult> {
       db
         .insert(mbtiSnapshots)
         .values({
-          userId: USER_ID,
+          userId,
           snapshotDate: periodEnd,
           scores: mbtiScores,
           sourceEntryIds,
