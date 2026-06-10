@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '@/lib/db/client';
+import { account, session, user, verification } from '@/lib/db/schema';
 import { isAllowedEmail, parseAllowList } from './whitelist';
 
 const allowList = parseAllowList(process.env.ALLOWED_EMAILS);
@@ -8,6 +9,7 @@ const allowList = parseAllowList(process.env.ALLOWED_EMAILS);
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
+    schema: { user, account, session, verification },
   }),
   socialProviders: {
     google: {
