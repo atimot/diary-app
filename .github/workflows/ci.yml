@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npx tsc --noEmit
+
+      - run: npm run test
+
+      - run: npm run build
+        env:
+          # lib/db/client.ts が import 時に DATABASE_URL 必須で throw するためのダミー値。
+          # Pool 生成は実接続しないので通る。本物の secret は CI に渡さない。
+          DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+          BETTER_AUTH_SECRET: ci-dummy-secret
+          BETTER_AUTH_URL: http://localhost:3000
+          NEXT_PUBLIC_BETTER_AUTH_URL: http://localhost:3000
