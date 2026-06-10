@@ -28,6 +28,14 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 - 加えて `vercel.json` で `installCommand: "npm install"` を明示しておくと auto-detect の事故が起きない。
 - Vercel auto-detect は package-manager の選択を `pnpm-workspace.yaml` / `pnpm-lock.yaml` 等で判断する。
 
+## npm lockfile と CI（M5）
+- macOS で `package-lock.json` を再生成すると、wasm32-wasi 系 optional パッケージ（`@rolldown/binding-wasm32-wasi`, `@tailwindcss/oxide-wasm32-wasi`）配下の `@emnapi/*` が lock から**脱落**し、linux の `npm ci` が `Missing: @emnapi/... from lock file` で壊れる（npm の既知バグ）。
+- 対策として `@emnapi/core` / `@emnapi/runtime` / `@emnapi/wasi-threads` を devDependencies + `overrides` で明示固定している。**消さないこと**。lockfile を作り直したら `npm ci` がローカルで exit 0 になるのを確認してから push する。
+
+## vercel.json の git.deploymentEnabled（M5）
+- minimatch では**先頭の `!` がパターン全体の否定**になる。`"!(main)": false` は main 自体にもマッチして本番デプロイまで止まる（実際に起きた）。
+- 「1 つでも true のルールにマッチすればデプロイされる」仕様なので、正解は `"**": false` + `"main": true` の 2 ルール構成。`*` はスラッシュ入りブランチ名にマッチしないため `**` を使う。
+
 ## Vercel CLI
 - 環境変数の非対話追加: `printf '%s' "$VAR" | npx vercel env add NAME production --force --yes`
 - **zsh では `${!VAR}` は使えない** → `${(P)VAR}` で indirect expansion する。bash と挙動が違う。
