@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isAllowedEmail } from './whitelist';
+import { isAllowedEmail, parseAllowList } from './whitelist';
 
 describe('isAllowedEmail', () => {
   it('returns true for exact match', () => {
@@ -24,5 +24,33 @@ describe('isAllowedEmail', () => {
 
   it('returns false for empty email', () => {
     expect(isAllowedEmail('', ['foo@bar.com'])).toBe(false);
+  });
+});
+
+describe('parseAllowList', () => {
+  it('returns empty array for undefined', () => {
+    expect(parseAllowList(undefined)).toEqual([]);
+  });
+
+  it('returns empty array for empty string', () => {
+    expect(parseAllowList('')).toEqual([]);
+  });
+
+  it('splits a single email', () => {
+    expect(parseAllowList('foo@bar.com')).toEqual(['foo@bar.com']);
+  });
+
+  it('splits multiple emails and trims whitespace', () => {
+    expect(parseAllowList(' foo@bar.com , baz@bar.com ')).toEqual([
+      'foo@bar.com',
+      'baz@bar.com',
+    ]);
+  });
+
+  it('drops empty entries', () => {
+    expect(parseAllowList('foo@bar.com,,baz@bar.com,')).toEqual([
+      'foo@bar.com',
+      'baz@bar.com',
+    ]);
   });
 });
