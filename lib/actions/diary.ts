@@ -3,17 +3,19 @@
 
 import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import { requireSession } from '@/lib/auth/session';
 import { db } from '@/lib/db/client';
 import { diaryEntries } from '@/lib/db/schema';
 import { diaryEntrySchema } from '@/lib/validation/diary';
-
-const USER_ID = process.env.DEFAULT_USER_ID ?? 'me';
 
 export type SaveResult =
   | { ok: true }
   | { ok: false; error: string };
 
 export async function saveDiaryEntry(formData: FormData): Promise<SaveResult> {
+  const session = await requireSession();
+  const userId = session.user.id;
+
   const parsed = diaryEntrySchema.safeParse({
     entryDate: formData.get('entryDate'),
     content: formData.get('content'),
@@ -27,7 +29,7 @@ export async function saveDiaryEntry(formData: FormData): Promise<SaveResult> {
     await db
       .insert(diaryEntries)
       .values({
-        userId: USER_ID,
+        userId,
         entryDate: parsed.data.entryDate,
         content: parsed.data.content,
       })
@@ -59,10 +61,13 @@ export async function deleteDiaryEntry(entryDate: string): Promise<DeleteResult>
     return { ok: false, error: '日付の形式が不正です' };
   }
 
+  const session = await requireSession();
+  const userId = session.user.id;
+
   try {
     await db
       .delete(diaryEntries)
-      .where(and(eq(diaryEntries.userId, USER_ID), eq(diaryEntries.entryDate, entryDate)));
+      .where(and(eq(diaryEntries.userId, userId), eq(diaryEntries.entryDate, entryDate)));
 
     revalidatePath('/');
     revalidatePath('/history');
