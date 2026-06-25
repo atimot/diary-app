@@ -10,6 +10,7 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
+import type { EnneagramScores } from '@/lib/enneagram/types';
 
 // ---------------------------------------------------------------------------
 // Better Auth tables
@@ -156,22 +157,16 @@ export const weeklyInsights = pgTable(
 export type WeeklyInsight = typeof weeklyInsights.$inferSelect;
 export type NewWeeklyInsight = typeof weeklyInsights.$inferInsert;
 
-export type MbtiScores = {
-  EI: number;
-  SN: number;
-  TF: number;
-  JP: number;
-};
-
-export const mbtiSnapshots = pgTable(
-  'mbti_snapshots',
+export const enneagramSnapshots = pgTable(
+  'enneagram_snapshots',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     userId: text('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
     snapshotDate: date('snapshot_date').notNull(),
-    scores: jsonb('scores').notNull().$type<MbtiScores>(),
+    scores: jsonb('scores').notNull().$type<EnneagramScores>(),
+    rationale: text('rationale').notNull(),
     sourceEntryIds: jsonb('source_entry_ids').notNull().$type<string[]>(),
     model: text('model').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true })
@@ -179,12 +174,12 @@ export const mbtiSnapshots = pgTable(
       .defaultNow(),
   },
   (table) => ({
-    userDateUnique: uniqueIndex('mbti_snapshots_user_date_unique').on(
+    userDateUnique: uniqueIndex('enneagram_snapshots_user_date_unique').on(
       table.userId,
       table.snapshotDate,
     ),
   }),
 );
 
-export type MbtiSnapshot = typeof mbtiSnapshots.$inferSelect;
-export type NewMbtiSnapshot = typeof mbtiSnapshots.$inferInsert;
+export type EnneagramSnapshot = typeof enneagramSnapshots.$inferSelect;
+export type NewEnneagramSnapshot = typeof enneagramSnapshots.$inferInsert;
