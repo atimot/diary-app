@@ -1,5 +1,7 @@
 import {
+  CENTER_COLOR_VARS,
   ENNEAGRAM_TYPE_NUMBERS,
+  ENNEAGRAM_TYPES,
   type EnneagramTypeNumber,
 } from '@/lib/enneagram/types';
 
@@ -20,6 +22,10 @@ function point(type: EnneagramTypeNumber, radius: number) {
     x: CX + radius * Math.sin(theta),
     y: CY - radius * Math.cos(theta),
   };
+}
+
+function colorOf(type: EnneagramTypeNumber): string {
+  return CENTER_COLOR_VARS[ENNEAGRAM_TYPES[type].center];
 }
 
 // 内側の三角形(3-6-9)とヘクサド(1-4-2-8-5-7)。エニアグラム図形の構成線。
@@ -66,19 +72,30 @@ export function EnneagramSymbol({ dominant, wing }: EnneagramSymbolProps) {
       />
       {ENNEAGRAM_TYPE_NUMBERS.map((t) => {
         const p = point(t, R);
+        const color = colorOf(t);
         const isDominant = t === dominant;
         const isWing = t === wing;
         return (
-          <circle
-            key={`dot-${t}`}
-            cx={p.x}
-            cy={p.y}
-            r={isDominant ? 9 : isWing ? 6 : 3.2}
-            className={
-              isDominant || isWing ? 'fill-primary' : 'fill-muted-foreground'
-            }
-            fillOpacity={isWing ? 0.5 : 1}
-          />
+          <g key={`dot-${t}`}>
+            {isDominant && (
+              <circle
+                cx={p.x}
+                cy={p.y}
+                r={13}
+                fill="none"
+                stroke={color}
+                strokeOpacity={0.3}
+                strokeWidth={2}
+              />
+            )}
+            <circle
+              cx={p.x}
+              cy={p.y}
+              r={isDominant ? 8.5 : isWing ? 6 : 3.4}
+              fill={color}
+              fillOpacity={isDominant ? 1 : isWing ? 0.85 : 0.5}
+            />
+          </g>
         );
       })}
       {ENNEAGRAM_TYPE_NUMBERS.map((t) => {
@@ -91,9 +108,10 @@ export function EnneagramSymbol({ dominant, wing }: EnneagramSymbolProps) {
             y={lp.y}
             textAnchor="middle"
             dominantBaseline="central"
-            fontSize={11}
-            className={emphasized ? 'fill-foreground' : 'fill-muted-foreground'}
-            fontWeight={emphasized ? 500 : 400}
+            fontSize={emphasized ? 12 : 11}
+            fill={colorOf(t)}
+            fillOpacity={emphasized ? 1 : 0.85}
+            fontWeight={emphasized ? 600 : 500}
           >
             {t}
           </text>

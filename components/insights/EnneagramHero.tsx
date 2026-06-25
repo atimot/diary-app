@@ -1,4 +1,8 @@
-import type { EnneagramType } from '@/lib/enneagram/types';
+import {
+  CENTER_COLOR_VARS,
+  CENTER_LABELS,
+  type EnneagramType,
+} from '@/lib/enneagram/types';
 
 interface EnneagramHeroProps {
   dominant: EnneagramType;
@@ -13,15 +17,31 @@ export function EnneagramHero({
   code,
   rationale,
 }: EnneagramHeroProps) {
+  const color = CENTER_COLOR_VARS[dominant.center];
+
   return (
-    <div className="space-y-4 rounded-xl border bg-card p-5">
+    <div
+      className="space-y-4 rounded-xl border border-l-4 bg-card p-5"
+      style={{ borderLeftColor: color }}
+    >
       <div className="space-y-1">
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs">
           今週のあなたに最も表れた動機
         </p>
-        <div className="flex items-baseline gap-2">
-          <span className="font-bold text-2xl tracking-tight">{code}</span>
+        <div className="flex flex-wrap items-baseline gap-2">
+          <span className="font-bold text-2xl tracking-tight" style={{ color }}>
+            {code}
+          </span>
           <span className="font-semibold text-lg">{dominant.name}</span>
+          <span
+            className="self-center rounded-md px-2 py-0.5 font-medium text-xs"
+            style={{
+              backgroundColor: `color-mix(in oklab, ${color} 15%, transparent)`,
+              color,
+            }}
+          >
+            {CENTER_LABELS[dominant.center]}
+          </span>
         </div>
         <p className="text-muted-foreground text-sm">
           ウイング: {wing.number} {wing.name}

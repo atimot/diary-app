@@ -9,6 +9,7 @@ import {
 import { ENNEAGRAM_TYPES } from '@/lib/enneagram/types';
 import { EnneagramCenters } from './EnneagramCenters';
 import { EnneagramHero } from './EnneagramHero';
+import { EnneagramLegend } from './EnneagramLegend';
 import { EnneagramSymbol } from './EnneagramSymbol';
 import { EnneagramTopBars } from './EnneagramTopBars';
 
@@ -44,6 +45,7 @@ export function EnneagramTrends({ snapshot }: EnneagramTrendsProps) {
             タイプ配置
           </h3>
           <EnneagramSymbol dominant={dominant} wing={wingType} />
+          <EnneagramLegend />
         </div>
         <div className="space-y-3">
           <h3 className="font-medium text-muted-foreground text-sm">

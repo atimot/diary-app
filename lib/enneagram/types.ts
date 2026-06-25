@@ -27,6 +27,14 @@ export const CENTER_LABELS: Record<EnneagramCenter, string> = {
   head: '頭（思考）',
 };
 
+// 3センターの色。値は globals.css の CSS 変数（ライト/ダーク両対応）。
+// SVG / HTML どちらも style 経由で var() 参照する。
+export const CENTER_COLOR_VARS: Record<EnneagramCenter, string> = {
+  gut: 'var(--center-gut)',
+  heart: 'var(--center-heart)',
+  head: 'var(--center-head)',
+};
+
 // 円周上の3センター。腹=8,9,1 / 心=2,3,4 / 頭=5,6,7。
 export const CENTER_MEMBERS: Record<EnneagramCenter, EnneagramTypeNumber[]> = {
   gut: [8, 9, 1],
