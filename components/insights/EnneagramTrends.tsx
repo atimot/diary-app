@@ -57,7 +57,7 @@ export function EnneagramTrends({ snapshot }: EnneagramTrendsProps) {
 
       <div className="space-y-3">
         <h3 className="font-medium text-muted-foreground text-sm">
-          3つのセンター（腹・心・頭）
+          3つのセンター（本能・感情・思考）
         </h3>
         <EnneagramCenters breakdown={centerBreakdown(scores)} />
       </div>

@@ -22,9 +22,9 @@ export const ENNEAGRAM_TYPE_NUMBERS: EnneagramTypeNumber[] = [
 ];
 
 export const CENTER_LABELS: Record<EnneagramCenter, string> = {
-  gut: '腹（本能）',
-  heart: '心（感情）',
-  head: '頭（思考）',
+  gut: '本能（腹）',
+  heart: '感情（心）',
+  head: '思考（頭）',
 };
 
 // 3センターの色。値は globals.css の CSS 変数（ライト/ダーク両対応）。
