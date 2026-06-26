@@ -8,7 +8,6 @@ import {
   nextMonth,
   prevMonth,
 } from '@/lib/calendar/month-grid';
-import { wafuMonthName } from '@/lib/calendar/wafu-month';
 
 interface DiaryCalendarProps {
   year: number;
@@ -36,8 +35,12 @@ function cellClasses(args: {
     return `${base} text-muted-foreground/50`;
   }
   if (written) {
-    const tone =
-      'bg-primary text-primary-foreground font-medium hover:opacity-90 transition';
+    // 日曜に書いた日は朱（--season）、それ以外は若葉（--primary）で塗る。
+    // bg-season 専用の foreground トークンは無いが、text-primary-foreground は
+    // 朱の上でも AA を満たす（light 4.82:1 / dark 4.97:1）ので緑セルと共用する。
+    const tone = isSunday
+      ? 'bg-season text-primary-foreground font-medium hover:opacity-90 transition'
+      : 'bg-primary text-primary-foreground font-medium hover:opacity-90 transition';
     return cell.isToday
       ? `${base} ${tone} ring-2 ring-foreground/40`
       : `${base} ${tone}`;
@@ -132,11 +135,8 @@ export function DiaryCalendar({
         >
           {prev.year}年{prev.month}月
         </Link>
-        <h2 className="text-center">
-          <span className="font-heading text-lg">{wafuMonthName(month)}</span>
-          <span className="block text-xs font-normal text-muted-foreground tabular-nums">
-            {year}年{month}月
-          </span>
+        <h2 className="text-center font-heading text-lg tabular-nums">
+          {year}年{month}月
         </h2>
         <Link
           href={nextHref}
@@ -189,10 +189,6 @@ export function DiaryCalendar({
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-3 w-3 rounded-sm ring-2 ring-primary" />
           今日
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="font-medium text-season">日</span>
-          日曜
         </span>
       </div>
     </div>
