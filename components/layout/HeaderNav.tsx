@@ -1,8 +1,17 @@
 'use client';
 
+import { CircleUser, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { signOut, useSession } from '@/lib/auth/client';
 
 const links = [
@@ -57,17 +66,22 @@ export function HeaderNav() {
         })}
       </div>
       {session?.user && (
-        <div className="flex items-center gap-3 text-sm">
-          <span className="text-muted-foreground">{session.user.email}</span>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleSignOut}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            aria-label="アカウントメニュー"
+            render={<Button type="button" variant="ghost" size="icon" />}
           >
-            サインアウト
-          </Button>
-        </div>
+            <CircleUser />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>{session.user.email}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
+              <LogOut />
+              サインアウト
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       )}
     </nav>
   );
