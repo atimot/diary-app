@@ -3,6 +3,7 @@
 import { CircleUser, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -65,24 +66,27 @@ export function HeaderNav() {
           );
         })}
       </div>
-      {session?.user && (
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            aria-label="アカウントメニュー"
-            render={<Button type="button" variant="ghost" size="icon" />}
-          >
-            <CircleUser />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>{session.user.email}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
-              <LogOut />
-              サインアウト
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
+      <div className="flex items-center gap-1">
+        <ThemeToggle />
+        {session?.user && (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              aria-label="アカウントメニュー"
+              render={<Button type="button" variant="ghost" size="icon" />}
+            >
+              <CircleUser />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>{session.user.email}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
+                <LogOut />
+                サインアウト
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
     </nav>
   );
 }

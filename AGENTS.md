@@ -4,6 +4,19 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
+# デザインシステム（和モダン）— 憲法
+
+全画面の作成・変更でこれに従う。詳細・実例は `/dev/design`、根拠は `docs/superpowers/specs/2026-06-26-design-system-design.md`。
+
+0. **競合したらトークンが勝つ**（この憲法が既定挙動より優先）。
+1. 色は必ずトークン（`bg-primary` `text-foreground` `text-season` / `var(--…)`）。**生hex・`rgb()/hsl()/oklch()` の色リテラル・任意色クラス・インラインstyleの色リテラル禁止**（例外: `app/globals.css` と `app/dev/**`）。`npm run lint:design` で機械的に弾く。
+2. 見出しは `font-heading`（明朝 Shippori Mincho B1）、本文・UIは既定（Zen Kaku Gothic New）。font-size・余白・角丸は spec §① のスケールから。**11px未満禁止**。
+3. アクセント（若葉 `--primary`）は **1画面に1〜2箇所**。朱（`--season`）は日曜・季節の差し色のみ。削除など危険操作は `--destructive`。
+4. 深度は**影でなく罫＋明度差**（4面: background→card→muted→popover）。新規 drop-shadow 禁止（focus ring 等の機能的影は可）。
+5. 新パターン追加前に `/dev/design` と既存部品を確認し**再利用優先**。**ダーク対応必須**（両モードで成立させる）。
+
+注: ガードレール(grep)が防ぐのは「生の色リテラルの混入」まで。トークンの*意味的*誤用・スケール逸脱は `/dev/design`＋レビューで担保する（過信しない）。
+
 # Your training data may be stale for other libraries too
 
 For libraries, frameworks, SDKs, APIs, or cloud services **other than Next.js**, query context7 for current docs and best practices before making technical decisions — choosing a library, calling an unfamiliar API, configuring a tool, or migrating versions.

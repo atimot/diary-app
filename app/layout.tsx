@@ -1,26 +1,40 @@
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Noto_Sans_JP } from 'next/font/google';
+import {
+  Geist_Mono,
+  Noto_Sans_JP,
+  Shippori_Mincho_B1,
+  Zen_Kaku_Gothic_New,
+} from 'next/font/google';
 import { HeaderNav } from '@/components/layout/HeaderNav';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import './globals.css';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
 });
 
-// 日本語用フォント。Geist はラテン文字専用で日本語グリフを持たないため、
-// 日本語は Noto Sans JP で全端末統一する（無いと OS 標準フォントにフォールバックして
-// Mac=ヒラギノ / Android=Noto と見た目が変わる）。
-// - variable フォントなので weight 指定は不要。
-// - subsets に 'japanese' は指定不可（next/font の subset 一覧に無い）。これは preload 対象の
-//   指定でしかなく、日本語グリフ自体は CSS 内の全 @font-face として self-host される。
-// - CJK は巨大なので preload: false。unicode-range で必要分だけ遅延ロードさせる。
+// 本文・UI 基盤のゴシック（シャープで現代的）。Geist Sans を退役させ和文を統一する。
+// 静的フォントなので weight 配列の明示が必須。CJK は preload しない。
+const zenKaku = Zen_Kaku_Gothic_New({
+  variable: '--font-zen-kaku',
+  weight: ['400', '500'],
+  subsets: ['latin'],
+  preload: false,
+  display: 'swap',
+});
+
+// 見出し用の明朝。静的フォントなので weight 必須。
+const shipporiMincho = Shippori_Mincho_B1({
+  variable: '--font-shippori',
+  weight: ['500', '600'],
+  subsets: ['latin'],
+  preload: false,
+  display: 'swap',
+});
+
+// フォールバック用（variable フォントなので weight 不要）。
 const notoSansJP = Noto_Sans_JP({
   variable: '--font-noto-sans-jp',
   subsets: ['latin'],
@@ -41,14 +55,17 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
-      className={`${geistSans.variable} ${geistMono.variable} ${notoSansJP.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${zenKaku.variable} ${shipporiMincho.variable} ${notoSansJP.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <header className="border-b">
-          <HeaderNav />
-        </header>
-        {children}
-        <SpeedInsights />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <header className="border-b">
+            <HeaderNav />
+          </header>
+          {children}
+          <SpeedInsights />
+        </ThemeProvider>
       </body>
     </html>
   );
