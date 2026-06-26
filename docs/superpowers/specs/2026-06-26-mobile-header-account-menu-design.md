@@ -54,7 +54,7 @@ SP（モバイル）幅でヘッダーを見ると、左ナビ（日記 / 履歴
 | `DropdownMenuContent` | `Menu.Portal` + `Menu.Positioner` + `Menu.Popup` | ポータル＋配置＋ポップアップを 1 つに包む |
 | `DropdownMenuItem` | `Menu.Item` | 操作項目（`onClick` 可、クリックで自動クローズ） |
 | `DropdownMenuSeparator` | `Menu.Separator` | 区切り線 |
-| `DropdownMenuLabel` | `Menu.GroupLabel`（非操作ラベル） | メール表示などの非操作テキスト |
+| `DropdownMenuLabel` | フォーカス不可の `div`（非操作ラベル） | メール表示などの非操作テキスト |
 
 スタイルの土台は `alert-dialog.tsx` の Popup（`bg-popover text-popover-foreground ring-1 ring-foreground/10 rounded-xl`、`data-open`/`data-closed` のアニメーション）と `button.tsx`（`ghost`/`outline` の hover トーン）に準拠。各要素に `data-slot` を付ける。
 
@@ -62,7 +62,7 @@ SP（モバイル）幅でヘッダーを見ると、左ナビ（日記 / 履歴
 
 **`DropdownMenuContent` の props 受け渡し**: 呼び出し側の `className` / `...props` は **`Menu.Popup`** に転送する（`alert-dialog.tsx` が Popup を直接スタイルするのと同じ）。配置は `Menu.Positioner` に既定値 `side="bottom"` / `align="end"` / `sideOffset={6}` を設定する（今回は固定で良い）。Popup には `min-w-56 max-w-[calc(100vw-2rem)]` を与え、375px 幅でも右端をはみ出さない（base-ui の collisionAvoidance も既定で効く）。
 
-**`DropdownMenuLabel` は非操作**: `Menu.Item` には**しない**（キーボードの ↑↓ ナビゲーションが非操作のメール行にフォーカスしてしまうため）。`Menu.GroupLabel`（中身は `div`）を使い、`data-slot="dropdown-menu-label"` を付ける。フォーカス不可（`tabIndex` を付けない）。
+**`DropdownMenuLabel` は非操作**: `Menu.Item` には**しない**（キーボードの ↑↓ ナビゲーションが非操作のメール行にフォーカスしてしまうため）。`Menu.GroupLabel` は `Menu.Group` 文脈前提なので使わず、**フォーカス不可の plain `div`**（`role` なし・`tabIndex` なし）に `data-slot="dropdown-menu-label"` を付ける。`Menu.Popup` の直下に置いても base-ui のロービングフォーカス対象にならないため安全。
 
 **`DropdownMenuItem` の破壊的トーン**: 任意 `variant`（`"default" | "destructive"`）を持たせる。`destructive` は **`text-destructive` ＋ 軽いホバー背景**（`hover:bg-destructive/10` / `focus:bg-destructive/10`）に留め、`button.tsx` の filled な destructive 背景（`bg-destructive/10` を常時敷く）は使わない。メニュー行は「ボタン」ではなく「行」として読ませる。
 
