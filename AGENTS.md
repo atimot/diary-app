@@ -59,6 +59,11 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 - `--primary` 等の CSS 変数は `oklch()` で定義されている。SVG / SVG 風コードで `var(--primary)` を直接使う。`hsl(var(--primary))` は無効。
 - `app/globals.css` の at-rule 順序: **`@import` 系を全部先に、`@plugin` 系を後ろに**。Biome の `noInvalidPositionAtImportRule` で hatching し、CSS 仕様にも合致する。
 
+## フォント（next/font + 日本語/CJK）
+- 日本語アプリなのに **日本語用 Web フォントが無い** と、日本語は端末の OS 標準フォント任せになり Mac/iPhone（ヒラギノ）と Android（Noto/Roboto）で見た目が変わる。`Geist` は**ラテン文字専用**なので日本語はカバーしない。日本語は `next/font/google` の **Noto Sans JP** で読み込んで全端末統一する。`app/layout.tsx` 参照。
+- **`@theme inline` の自己参照に注意**：`--font-sans: var(--font-sans)` のような自己参照は何も当たらず、ブラウザ既定フォントへフォールバックする（shadcn 雛形が生成。`5132e10` で混入し `#29` で修正）。必ず next/font の変数を指す（`var(--font-geist-sans)` 等）。`font-family` は **Geist → Noto Sans JP → system** のスタックにして字種ごとにフォールバックさせる。
+- **next/font × CJK の罠**：`subsets` に **`'japanese'` は存在しない**（next/font の subset 一覧は `cyrillic / latin / latin-ext / vietnamese` のみ）。`subsets` は「どの subset を **preload** するか」を指定するだけで、**日本語グリフは CSS 内の全 `@font-face` として self-host される**（`findFontFilesInCss` が subsets に関係なく全ファイルをDLし、`subsets` は preload フラグにしか使われない）。よって日本語用フォントは `subsets: ['latin']` + `preload: false` でよい。CJK は巨大なので **preload しない**（`unicode-range` でブラウザが必要分だけ遅延ロードする）。Noto Sans JP は variable 対応なので `weight` 指定も不要。
+
 ## Biome のスタイルポリシー
 - `biome.json` で `quoteStyle: 'single'`、`jsxQuoteStyle: 'double'`。
 - `components/ui/**` だけは override で `quoteStyle: 'double'`（shadcn 自動生成と整合させるため）。
