@@ -50,9 +50,11 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 
 ## Tiptap（日記エディタ）
 - 入力 UI は Tiptap v3（`@tiptap/react` + `@tiptap/starter-kit` + 公式 `@tiptap/markdown`）。保存は従来通り Markdown 文字列で、表示は `react-markdown` のまま。
-- `@tiptap/core` / `@tiptap/pm` / `@tiptap/react` / `@tiptap/starter-kit` / `@tiptap/markdown` は **peer が exact pin**。5 つは常に同一バージョンに揃える。Dependabot 更新時もまとめて上げる（1 つだけ上がると実行時エラー）。
+- `@tiptap/core` / `@tiptap/pm` / `@tiptap/react` / `@tiptap/starter-kit` / `@tiptap/markdown` / `@tiptap/extensions` は **peer が exact pin**。6 つは常に同一バージョンに揃える。Dependabot 更新時もまとめて上げる（1 つだけ上がると実行時エラー）。
 - `useEditor` には必ず `immediatelyRender: false`（App Router の SSR エラー回避）。
 - エディタ設定は `lib/editor/diary-extensions.ts` に集約。見出しは H2/H3 のみ。
+- **プレースホルダーは公式 `Placeholder`（`@tiptap/extensions/placeholder`）を使う**。自前の絶対配置 overlay は H2/H3 でカーソルとサイズが不一致になり、リストでは重なるので廃止済み。空ブロックに付く `is-editor-empty` を CSS `::before` で描画（`app/globals.css`）。リストはトップレベルが textblock でないため既定設定で表示されない（重なり回避）。
+  - **CSS セレクタに `:first-child` を付けない**。`showOnlyCurrent:true`（既定）で `is-editor-empty` はカーソルのある空ブロックだけ（常に高々1個）に付くため、空の状態で Enter して2行目に居ると先頭ではなくなり `:first-child` だと消える。`.tiptap .is-editor-empty::before` で十分。
 
 ## shadcn / Tailwind v4
 - このプロジェクトは shadcn の `base-nova` スタイル + **`@base-ui/react`**（Radix UI ではない）を使う。

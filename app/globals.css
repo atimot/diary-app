@@ -139,3 +139,17 @@
     @apply font-sans;
   }
 }
+
+/* Tiptap プレースホルダー（公式 @tiptap/extensions Placeholder）。
+   空エディタ(editor.isEmpty)でカーソルがある空ブロックにだけ is-editor-empty が付く
+   （showOnlyCurrent:true なので装飾ノードは常に高々1個）。それを ::before で描画する。
+   現在ブロック(段落/見出し)のスタイルを継承するのでカーソルとフォントサイズが一致し、
+   リストはトップレベルが textblock でないため表示されず重なりも起きない。
+   :first-child は付けない — Enter で2行目に居ると先頭でなくなり消えてしまうため。 */
+.tiptap .is-editor-empty::before {
+  content: attr(data-placeholder);
+  color: var(--muted-foreground);
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
