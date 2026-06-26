@@ -32,7 +32,7 @@
 ```css
   --center-gut: oklch(0.58 0.085 75);   /* 黄土 ochre */
   --center-heart: oklch(0.52 0.12 25);  /* 茜 madder red */
-  --center-head: oklch(0.48 0.09 255);  /* 藍 indigo */
+  --center-head: oklch(0.44 0.09 255);  /* 藍 indigo（11px文字/細バーのコントラスト確保にLを下げる） */
 ```
 
 **ダーク（`.dark`）**
