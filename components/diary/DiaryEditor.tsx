@@ -19,10 +19,11 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { deleteDiaryEntry, saveDiaryEntry } from '@/lib/actions/diary';
 
-// 重量級の編集UIは初期バンドルから外す（クライアントJS削減）。
-// RichTextEditor=Tiptap/ProseMirror(+marked) は「編集」タブを開くまで、
-// DiaryMarkdown=react-markdown は「プレビュー」タブを開くまでDLしない。
-// DiaryEditor 自体が 'use client' なので ssr:false が使える。
+// 重量級の編集UIは初期バンドルから外す（クライアントJS削減）。どちらも
+// `{activeTab === … && …}` でタブ選択時のみ描画＝そのタブを開くまで chunk を読まない。
+//
+// RichTextEditor=Tiptap/ProseMirror(+marked) は browser API 依存（immediatelyRender:false）
+// のため **ssr:false 必須**。編集タブを開くまでロードしない。
 const RichTextEditor = dynamic(
   () =>
     import('@/components/diary/RichTextEditor').then((m) => m.RichTextEditor),
@@ -34,10 +35,13 @@ const RichTextEditor = dynamic(
   },
 );
 
+// DiaryMarkdown=react-markdown は SSR 安全なので **ssr は既定(true)のまま**にする。
+// プレビュー本文は閲覧の主動線なので SSR して初期HTMLに乗せる（ssr:false にすると
+// 本文がクライアント描画のみになり、スケルトンのちらつき／背景タブで空表示になる）。
+// それでも編集タブ既定（新規エントリ）ではプレビューが描画されず chunk は読まれない。
 const DiaryMarkdown = dynamic(
   () => import('@/components/diary/DiaryMarkdown').then((m) => m.DiaryMarkdown),
   {
-    ssr: false,
     loading: () => <div className="min-h-[15rem] animate-pulse" />,
   },
 );
