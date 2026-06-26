@@ -1,7 +1,6 @@
 'use client';
 
 import { EditorContent, useEditor } from '@tiptap/react';
-import { useState } from 'react';
 import { EditorToolbar } from '@/components/diary/EditorToolbar';
 import { createDiaryEditorExtensions } from '@/lib/editor/diary-extensions';
 
@@ -16,10 +15,11 @@ export function RichTextEditor({
   onChange,
   placeholder,
 }: RichTextEditorProps) {
-  const [isEmpty, setIsEmpty] = useState(value.trim().length === 0);
-
   const editor = useEditor({
-    extensions: createDiaryEditorExtensions(),
+    // プレースホルダーは公式 Placeholder 拡張（diary-extensions に集約）で描画する。
+    // 現在ブロック(段落/見出し)に ::before として入るのでカーソルとサイズが一致し、
+    // リストではトップレベルが textblock でないため表示されず重なりも起きない。
+    extensions: createDiaryEditorExtensions(placeholder ?? ''),
     content: value,
     contentType: 'markdown',
     immediatelyRender: false,
@@ -29,26 +29,15 @@ export function RichTextEditor({
           'prose prose-neutral dark:prose-invert max-w-none min-h-[15rem] px-3 py-2 text-base outline-none md:text-sm',
       },
     },
-    onCreate: ({ editor }) => {
-      setIsEmpty(editor.isEmpty);
-    },
     onUpdate: ({ editor }) => {
       onChange(editor.getMarkdown());
-      setIsEmpty(editor.isEmpty);
     },
   });
 
   return (
     <div className="rounded-lg border border-input bg-transparent">
       <EditorToolbar editor={editor} />
-      <div className="relative">
-        {isEmpty && placeholder ? (
-          <span className="pointer-events-none absolute left-3 top-2 text-base text-muted-foreground md:text-sm">
-            {placeholder}
-          </span>
-        ) : null}
-        <EditorContent editor={editor} />
-      </div>
+      <EditorContent editor={editor} />
     </div>
   );
 }
