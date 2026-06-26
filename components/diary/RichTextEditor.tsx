@@ -1,6 +1,7 @@
 'use client';
 
-import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
+import { EditorContent, useEditor } from '@tiptap/react';
+import { useState } from 'react';
 import { EditorToolbar } from '@/components/diary/EditorToolbar';
 import { createDiaryEditorExtensions } from '@/lib/editor/diary-extensions';
 
@@ -15,6 +16,8 @@ export function RichTextEditor({
   onChange,
   placeholder,
 }: RichTextEditorProps) {
+  const [isEmpty, setIsEmpty] = useState(value.trim().length === 0);
+
   const editor = useEditor({
     extensions: createDiaryEditorExtensions(),
     content: value,
@@ -26,16 +29,14 @@ export function RichTextEditor({
           'prose prose-neutral dark:prose-invert max-w-none min-h-[15rem] px-3 py-2 text-base outline-none md:text-sm',
       },
     },
+    onCreate: ({ editor }) => {
+      setIsEmpty(editor.isEmpty);
+    },
     onUpdate: ({ editor }) => {
       onChange(editor.getMarkdown());
+      setIsEmpty(editor.isEmpty);
     },
   });
-
-  const isEmpty =
-    useEditorState({
-      editor,
-      selector: ({ editor }) => editor?.isEmpty ?? true,
-    }) ?? true;
 
   return (
     <div className="rounded-lg border border-input bg-transparent">
