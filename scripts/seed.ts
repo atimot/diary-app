@@ -13,8 +13,8 @@ if (!USER_ID) {
 // chronological oldest-to-newest order. Each entry is 3-5 paragraphs and
 // uses a mix of headings, lists, blockquotes, bold/italic, task lists,
 // and occasional tables — so the preview tab is visually rich and the
-// AI weekly summary / MBTI scoring has enough signal to identify themes.
-// Persona: introspective, F-leaning, work-life balance focused.
+// AI weekly summary / Enneagram scoring has enough signal to identify themes.
+// Persona: introspective, harmony-seeking, work-life balance focused.
 const sampleEntries: string[] = [
   `## 朝のジョギング
 

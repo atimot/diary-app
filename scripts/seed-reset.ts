@@ -17,8 +17,8 @@ async function main() {
 
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-  const mbti = await pool.query(
-    'DELETE FROM mbti_snapshots WHERE user_id = $1',
+  const enneagram = await pool.query(
+    'DELETE FROM enneagram_snapshots WHERE user_id = $1',
     [USER_ID],
   );
   const insights = await pool.query(
@@ -33,7 +33,7 @@ async function main() {
   await pool.end();
 
   console.log(
-    `✅ Deleted ${mbti.rowCount} mbti_snapshots, ${insights.rowCount} weekly_insights and ${entries.rowCount} diary_entries for user "${USER_ID}"`,
+    `✅ Deleted ${enneagram.rowCount} enneagram_snapshots, ${insights.rowCount} weekly_insights and ${entries.rowCount} diary_entries for user "${USER_ID}"`,
   );
 }
 

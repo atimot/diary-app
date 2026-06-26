@@ -6,7 +6,7 @@ import { generateCombinedInsight } from '@/lib/ai/combined-insight';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@/lib/db/client';
 import { listDiaryEntries } from '@/lib/db/queries/diary';
-import { mbtiSnapshots, weeklyInsights } from '@/lib/db/schema';
+import { enneagramSnapshots, weeklyInsights } from '@/lib/db/schema';
 
 const MIN_ENTRIES = 7;
 
@@ -41,10 +41,10 @@ export async function regenerateInsight(): Promise<RegenerateResult> {
     const periodEnd = dates[dates.length - 1];
     const sourceEntryIds = recent.map((e) => e.id);
 
-    // 1 リクエストで summary + advice + MBTI を取得
+    // 1 リクエストで summary + advice + エニアグラム親和度を取得
     const { output, model } = await generateCombinedInsight(recent);
-    const { summary, advice, mbti } = output;
-    const { rationale: _rationale, ...mbtiScores } = mbti;
+    const { summary, advice, enneagram } = output;
+    const { scores, rationale } = enneagram;
 
     // 並列に DB upsert（同じ AI 結果から派生する 2 レコード）
     await Promise.all([
@@ -71,18 +71,20 @@ export async function regenerateInsight(): Promise<RegenerateResult> {
           },
         }),
       db
-        .insert(mbtiSnapshots)
+        .insert(enneagramSnapshots)
         .values({
           userId,
           snapshotDate: periodEnd,
-          scores: mbtiScores,
+          scores,
+          rationale,
           sourceEntryIds,
           model,
         })
         .onConflictDoUpdate({
-          target: [mbtiSnapshots.userId, mbtiSnapshots.snapshotDate],
+          target: [enneagramSnapshots.userId, enneagramSnapshots.snapshotDate],
           set: {
-            scores: mbtiScores,
+            scores,
+            rationale,
             sourceEntryIds,
             model,
             createdAt: new Date(),

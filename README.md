@@ -61,7 +61,7 @@ ALLOWED_EMAILS="me@example.com,partner@example.com"
 SEED_USER_ID=<user-id> npm run db:seed
 SEED_USER_ID=<user-id> npm run db:seed 30
 
-# 関連3テーブル (diary_entries / weekly_insights / mbti_snapshots) を全削除
+# 関連3テーブル (diary_entries / weekly_insights / enneagram_snapshots) を全削除
 SEED_USER_ID=<user-id> npm run db:seed:reset
 ```
 

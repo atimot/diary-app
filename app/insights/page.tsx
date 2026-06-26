@@ -1,9 +1,8 @@
-import { MBTISliders } from '@/components/insights/MBTISliders';
+import { EnneagramTrends } from '@/components/insights/EnneagramTrends';
 import { RegenerateButton } from '@/components/insights/RegenerateButton';
 import { listDiaryEntries } from '@/lib/db/queries/diary';
+import { getLatestEnneagramSnapshot } from '@/lib/db/queries/enneagram';
 import { getLatestInsight } from '@/lib/db/queries/insight';
-import { getLatestMbtiSnapshot } from '@/lib/db/queries/mbti';
-import type { MbtiScores } from '@/lib/db/schema';
 
 const MIN_ENTRIES = 7;
 
@@ -19,10 +18,10 @@ function formatDateTime(value: Date): string {
 }
 
 export default async function InsightsPage() {
-  const [entries, insight, mbti] = await Promise.all([
+  const [entries, insight, enneagram] = await Promise.all([
     listDiaryEntries(),
     getLatestInsight(),
-    getLatestMbtiSnapshot(),
+    getLatestEnneagramSnapshot(),
   ]);
 
   // state 1: 件数不足
@@ -39,8 +38,8 @@ export default async function InsightsPage() {
     );
   }
 
-  // state 2: 件数は足りているが、insight も mbti もまだ生成していない
-  if (!insight && !mbti) {
+  // state 2: 件数は足りているが、insight も enneagram もまだ生成していない
+  if (!insight && !enneagram) {
     return (
       <main className="container mx-auto max-w-3xl p-6">
         <h1 className="mb-6 text-2xl font-bold">あなたの傾向</h1>
@@ -87,17 +86,7 @@ export default async function InsightsPage() {
         </>
       )}
 
-      {mbti && (
-        <section className="space-y-3">
-          <div>
-            <h2 className="text-lg font-semibold">MBTI 傾向</h2>
-            <p className="text-xs text-muted-foreground">
-              占いではなく、最近7日分の日記から AI が読み取った参考的な傾向
-            </p>
-          </div>
-          <MBTISliders scores={mbti.scores as MbtiScores} />
-        </section>
-      )}
+      {enneagram && <EnneagramTrends snapshot={enneagram} />}
 
       <footer className="border-t pt-4">
         <RegenerateButton label="再生成する" pendingLabel="分析中…" />
