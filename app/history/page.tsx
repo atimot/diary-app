@@ -37,7 +37,7 @@ export default async function HistoryPage({ searchParams }: PageProps) {
       <div className="mb-6 flex flex-wrap items-baseline gap-3">
         <h1 className="text-2xl font-bold">日記の履歴</h1>
         {streak > 0 && (
-          <span className="rounded-full bg-accent px-3 py-1 text-sm font-medium">
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
             🔥 {streak}日連続記入中
           </span>
         )}

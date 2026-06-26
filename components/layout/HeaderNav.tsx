@@ -47,7 +47,7 @@ export function HeaderNav() {
               aria-current={active ? 'page' : undefined}
               className={
                 active
-                  ? 'font-semibold text-foreground'
+                  ? 'font-semibold text-primary'
                   : 'text-muted-foreground hover:text-foreground'
               }
             >

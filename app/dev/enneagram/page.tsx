@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { EnneagramTrends } from '@/components/insights/EnneagramTrends';
+import { Button } from '@/components/ui/button';
 import type { EnneagramSnapshot } from '@/lib/db/schema';
 import type { EnneagramScores } from '@/lib/enneagram/types';
 
@@ -93,6 +94,32 @@ export default function EnneagramPreviewPage() {
           ヒーローカードの描画を確認できます。
         </p>
       </header>
+
+      <section className="space-y-4 border-t pt-8">
+        <p className="font-medium text-muted-foreground text-xs">
+          テーマ確認（暖色アクセント＋温かいニュートラル）
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button type="button">保存</Button>
+          <Button type="button" variant="outline">
+            サインアウト
+          </Button>
+          <Button type="button" variant="link">
+            リンク
+          </Button>
+          <span className="rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-sm">
+            🔥 7日連続記入中
+          </span>
+        </div>
+        <div className="flex flex-wrap items-center gap-4 text-sm">
+          <span className="font-semibold text-primary">アクティブなナビ</span>
+          <span className="text-muted-foreground">非アクティブ</span>
+          <span className="text-foreground">本文（ink は無彩のまま）</span>
+        </div>
+        <div className="rounded-lg border bg-card p-4 text-sm text-card-foreground">
+          カード面（わずかに温かい白／ダークでは温かいチャコール）。境界線・入力枠も同系。
+        </div>
+      </section>
 
       {PROFILES.map((p) => (
         <div
