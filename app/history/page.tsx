@@ -6,7 +6,7 @@ import {
   parseYearMonth,
   todayInTokyo,
 } from '@/lib/calendar/month-grid';
-import { listDiaryEntries } from '@/lib/db/queries/diary';
+import { listEntryDates } from '@/lib/db/queries/diary';
 import { computeStreak } from '@/lib/diary/streak';
 
 interface PageProps {
@@ -25,12 +25,9 @@ export default async function HistoryPage({ searchParams }: PageProps) {
   const year = requested?.year ?? currentYear;
   const month = requested?.month ?? currentMonth;
 
-  const entries = await listDiaryEntries();
-  const writtenDates = new Set(entries.map((e) => e.entryDate));
-  const streak = computeStreak(
-    entries.map((e) => e.entryDate),
-    today,
-  );
+  const dates = await listEntryDates();
+  const writtenDates = new Set(dates);
+  const streak = computeStreak(dates, today);
 
   return (
     <main className="container mx-auto max-w-3xl p-6">
@@ -49,7 +46,7 @@ export default async function HistoryPage({ searchParams }: PageProps) {
         writtenDates={writtenDates}
         currentYearMonth={formatYearMonth(currentYear, currentMonth)}
       />
-      {entries.length === 0 && (
+      {dates.length === 0 && (
         <p className="mt-6 text-sm text-muted-foreground">
           まだ日記がありません。トップから書いてみましょう。
         </p>

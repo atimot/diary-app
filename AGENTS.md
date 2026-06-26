@@ -33,6 +33,15 @@ Skip for: refactoring, debugging business logic, general programming concepts.
   - `neon-http` は **interactive `db.transaction()` 非対応**（呼ぶと throw）。本アプリは tx 未使用なので安全。複数文を原子的に実行したくなったら `db.batch([...])`。Better Auth の drizzle アダプタも transaction を実装せず、コアが no-op で patch するため neon-http で動く（`node_modules/better-auth/dist/db/adapter-base.mjs` の自動 patch）。
 - **Better Auth の `session.cookieCache`** を有効化（`lib/auth/server.ts`）。`requireSession()`=`getSession` の毎回 DB 照会を署名付き短命 cookie 読取りに置換。失効の即時性が `maxAge` ぶん遅れるが単一ユーザーなので許容。即時失効が要る所だけ `getSession({ query: { disableCookieCache: true } })`。
 
+## パフォーマンス: クライアントJS / プリフェッチ（体感の重さ）
+- 実測（本番・実ブラウザの Resource Timing）でホーム `/` は **JS 解凍後 1.37MB**、最大チャンク 648KB が **Tiptap/ProseMirror(+marked)**。`DiaryEditor` が `RichTextEditor` を静的 import していたため、閲覧（preview）でもエディタを丸ごと読んでいた。
+- **対策**: `DiaryEditor`（`'use client'`）内で `RichTextEditor` / `DiaryMarkdown` を `next/dynamic(ssr:false)` 化し、`{activeTab === 'edit' && …}` で**タブ選択時のみマウント**。これで `/` の First Load JS が 1393KB→784KB（約44%減）。`immediatelyRender:false` 済みなので ssr:false 化は安全。`content` は hidden input 経由で送るのでエディタ unmount でも保存は壊れない。
+- `/history` は実測 **89 リクエスト中 50 が `/diary/*` の RSC プリフェッチ**（`?_rsc=`）。`DiaryCalendar` の全セル `<Link>` を App Router 既定の viewport プリフェッチが一斉発火させ、各々が動的ルート(sin1 関数+DB)を叩いていた。
+  - **対策**: 日付セルだけ `components/diary/CalendarDayLink.tsx`（`prefetch={active ? null : false}` の hover/touch プリフェッチ）に置換。月送り等のナビ `<Link>` は据え置き。
+- **`loading.tsx` を全ルートに追加**（`app/loading.tsx` + history/insights）。動的(ƒ)レンダリングのサーバー応答（cold 〜780ms）待ちを即スケルトンで隠す。`loading.tsx` 不在だと真っ白待ち＝体感の重さに直結。
+- クエリは**使う列だけ**。`/history` は `listEntryDates()`（entryDate のみ）、`/insights` の件数判定は `countDiaryEntries()`（`count(*)`）。`listDiaryEntries()`（本文全件）は AI 分析（`regenerateInsight`）が本文を使うので残す。
+- **誤検知に注意**: 「CSS 12 ファイル 251KB・圧縮未効き」は計測アーティファクト（Deployment Protection の SSO ゲート越し or dev ビルド）。実ビルドは 2 ファイル 167KB（gz 後約45KB）で minify＆圧縮済み。Vercel は静的アセットを自動で br/gzip 圧縮し `/_next/static/*` に `immutable` を付与する（手当て不要）。`lucide-react` も Next.js 16 の `optimizePackageImports` 既定対象（追加不要）。
+
 ## Vercel + npm 運用
 - scaffold の `pnpm-workspace.yaml` が残っていると Vercel が pnpm install を試みて build 失敗する。npm 運用なら削除する。
 - 加えて `vercel.json` で `installCommand: "npm install"` を明示しておくと auto-detect の事故が起きない。

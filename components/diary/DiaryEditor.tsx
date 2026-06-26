@@ -1,10 +1,9 @@
 // components/diary/DiaryEditor.tsx
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { DiaryMarkdown } from '@/components/diary/DiaryMarkdown';
-import { RichTextEditor } from '@/components/diary/RichTextEditor';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +18,29 @@ import {
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { deleteDiaryEntry, saveDiaryEntry } from '@/lib/actions/diary';
+
+// 重量級の編集UIは初期バンドルから外す（クライアントJS削減）。
+// RichTextEditor=Tiptap/ProseMirror(+marked) は「編集」タブを開くまで、
+// DiaryMarkdown=react-markdown は「プレビュー」タブを開くまでDLしない。
+// DiaryEditor 自体が 'use client' なので ssr:false が使える。
+const RichTextEditor = dynamic(
+  () =>
+    import('@/components/diary/RichTextEditor').then((m) => m.RichTextEditor),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="min-h-[15rem] animate-pulse rounded-lg border border-input" />
+    ),
+  },
+);
+
+const DiaryMarkdown = dynamic(
+  () => import('@/components/diary/DiaryMarkdown').then((m) => m.DiaryMarkdown),
+  {
+    ssr: false,
+    loading: () => <div className="min-h-[15rem] animate-pulse" />,
+  },
+);
 
 interface DiaryEditorProps {
   entryDate: string;
@@ -86,17 +108,20 @@ export function DiaryEditor({
         </TabsList>
 
         <TabsContent value="edit">
-          <RichTextEditor
-            key={entryDate}
-            value={content}
-            onChange={setContent}
-            placeholder="今日はどんな1日でしたか？"
-          />
+          {/* 編集タブを開いたときだけ Tiptap をマウント＝チャンクを初DL */}
+          {activeTab === 'edit' && (
+            <RichTextEditor
+              key={entryDate}
+              value={content}
+              onChange={setContent}
+              placeholder="今日はどんな1日でしたか？"
+            />
+          )}
         </TabsContent>
 
         <TabsContent value="preview">
           <div className="min-h-[15rem] rounded-md border p-4">
-            <DiaryMarkdown content={content} />
+            {activeTab === 'preview' && <DiaryMarkdown content={content} />}
           </div>
         </TabsContent>
       </Tabs>
