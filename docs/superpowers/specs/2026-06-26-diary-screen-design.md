@@ -37,29 +37,31 @@ formatDiaryDate(iso: string): { eyebrow: string; full: string; weekday: string }
 
 - props: `date: string`（`YYYY-MM-DD`）。
 - 描画：
-  - eyebrow：`<p>` 小さめ（`text-xs`/`text-sm`）・`text-muted-foreground`・`tabular-nums`・`tracking` 広め。`{eyebrow}`。
+  - eyebrow：`<p>` `text-xs`・`uppercase`・`tracking-[0.18em]`・`text-muted-foreground`・`tabular-nums`（土台 spec §① の eyebrow 型に合わせる）。`{eyebrow}`。
   - 見出し：`<h1>`（`font-heading` は globals.css の base ルールで自動適用）`text-2xl sm:text-3xl`、`{full}` ＋ 続けて曜日を一段muted（例 `<span className="text-muted-foreground">{weekday}</span>`、間に全角スペース or `gap`）。
 - 両ページの既存ベタ見出し（ホーム「`{date} の日記`」、[date]「`{date}`」）をこのコンポーネントに置換。「の日記」表記は廃止（ナビが既に「日記」）。
 
 ## ② エディタ / タブ / 保存（`DiaryEditor` ほか）
 
-- **タブ（編集/プレビュー）**：下線スタイル。共有 `components/ui/tabs` は変更せず、`DiaryEditor` 内で `TabsList`/`TabsTrigger` に className を当てて実現（リストの枠・背景を消し、選択中トリガーに `--primary`(若葉)の下線、非選択は `text-muted-foreground`）。`/dev/design` のタブには影響させない。
-- **保存**：手動のまま。保存ボタンは既定 `<Button>`＝`bg-primary`（若葉）で据え置き。**成功フィードバックの色を `text-green-600 dark:text-green-400` → `text-muted-foreground`** に変更（静かな「保存しました」）。エラーは `text-destructive` 据え置き。
+- **タブ（編集/プレビュー）**：`components/ui/tabs` に既存の `variant="line"` があるので `TabsList` に渡す（下線スタイル）。既定の下線色は `foreground`（黒）なので `TabsTrigger` に `after:bg-primary` の className を足して**若葉の下線**にし、非選択は `text-muted-foreground`。共有 ui は変更しない（`/dev/design` のタブは variant 未指定なので無影響）。
+- **保存**：手動のまま。保存ボタンは既定 `<Button>`＝`bg-primary`（若葉）で据え置き。**成功フィードバックの色を `text-green-600 dark:text-green-400` → `text-muted-foreground`** に変更（静かな「保存しました」）。エラーは `text-destructive` 据え置き。※この緑→トークンの1行は現コード（`DiaryEditor.tsx`）に残存しているので**忘れず修正**（off-token を1件解消）。
 - **コンテナ**：プレビュー枠（現 `min-h-[15rem] rounded-md border p-4`）を `rounded-xl border bg-card` ＋エディトリアルな余白に。エディタ枠（`RichTextEditor` の `rounded-lg border border-input`）も `rounded-xl border` に統一（角丸・罫をトークンで揃える）。
 
 ## ③ プレビュー / 本文タイポ（`.prose` を和モダンに）
 
 編集（Tiptap、`prose prose-neutral`）も表示（react-markdown、`prose prose-neutral`）も `.prose` を使うため、`app/globals.css` に **1か所**追加して両方に効かせる（DRY）。
 
-- 見出し明朝：`.prose :is(h1, h2, h3) { font-family: var(--font-heading); }`（typography プラグインの `--tw-prose-headings` は色用なので font は別指定）。
-- 本文の読み物チューニング（軽め）：和文の行間を少し広げる。`.prose :where(p):not(:where([class~="not-prose"] *)) { line-height: 1.9; }`（過度に prose 内部と競合しない範囲で。letter-spacing は据え置き or `0.02em` まで）。
-- これらは `@layer base` の外（通常ルール）か `@layer` 内かは Biome の at-rule 順序（AGENTS.md）に反しない場所に置く。色は使わないので lint:design に影響なし。
+- **波及方針（明示）**：`.prose` への変更はデザインシステム全体の prose 既定として **意図的にグローバル**に効かせる。現状 `.prose` を使うのは日記のエディタ/プレビューのみ（insights 等は plain `<p>`）。将来 prose を使う画面にも同じ読み物体裁が乗るのは望ましいので `DiaryMarkdown` 等には閉じない。
+- 見出し明朝：`.prose :is(h1, h2, h3) { font-family: var(--font-heading); }` を**明示**で置く。実は PR1 の base ルール `h1,h2,h3{font-family:var(--font-heading)}` が prose 見出しにも効く（typography は font-family を設定しないため）が、レイヤ順の取りこぼしを避ける belt-and-suspenders として `.prose` 文脈にも明示する。
+- 本文の読み物チューニング（軽め）：`.prose p { line-height: 1.9; }`（このアプリの `.prose` 内に `not-prose` ネストは無いので簡略セレクタで十分）。letter-spacing は据え置き。
+- 配置は AGENTS.md の at-rule 順序（`@import` 系を先・`@plugin` 系を後）に反しない通常ルールとして置く。色は使わないので lint:design に影響なし。
 
 ## 触るファイル
 
 - 新規：`lib/diary/format-date.ts`、`lib/diary/format-date.test.ts`、`components/diary/DiaryDateHeader.tsx`
 - 変更：`app/page.tsx`、`app/diary/[date]/page.tsx`、`components/diary/DiaryEditor.tsx`、`components/diary/RichTextEditor.tsx`、`app/globals.css`
-- 任意（スコープ内・小）：`app/dev/design/page.tsx` に DiaryDateHeader の見本を1つ追加（見本帳の網羅性向上）。`components/diary/EditorToolbar.tsx` はトークン整合の微調整のみ（機能不変）。
+- スコープ内（小）：`app/dev/design/page.tsx` に `DiaryDateHeader` の見本を1つ追加（検証を楽に＋憲法5条の再利用導線）。`components/diary/RichTextEditor.tsx` の loading スケルトン（`rounded-lg border border-input`）も `rounded-xl border` に合わせ、ロード中のガタつきを防ぐ。
+- 変更しない：`components/diary/EditorToolbar.tsx` は既にトークン適合（`bg-background/90`・`bg-border`・`Button`）のため原則さわらない。
 
 ## 検証
 
