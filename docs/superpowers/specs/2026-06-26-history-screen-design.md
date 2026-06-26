@@ -56,8 +56,9 @@ wafuMonthName(month: number): string  // 1..12 → 睦月..師走
 
 - 現状の `🔥 {streak}日連続記入中`（`bg-primary/10 ... text-primary` の絵文字バッジ）を廃止。
 - 新規 **`components/diary/StreakBadge.tsx`**（サーバーコンポーネント、props `streak: number`、戻り型 `ReactElement | null`、`streak<=0` は `null`）：
-  - `rounded-xl border bg-card` の小カード（横長、`inline-flex items-center gap-3` 程度）。
-  - lucide `Flame`（`text-primary`＝若葉）＋ **明朝の大型 tabular 数字**（`font-heading text-2xl tabular-nums`）`{streak}` ＋ 小さく「日連続記入中」（`text-sm text-muted-foreground`）。
+  - **墨ベタ地のカード**（提案モック準拠）：light は `bg-foreground`（墨）、dark は背景と同化するため `dark:bg-card dark:border dark:border-border`（1段上のカード地）。横長 `inline-flex items-center gap-3` の `rounded-xl px-4 py-2.5`。
+  - lucide `Flame`（`text-primary`＝若葉）＋ **若葉の大型 tabular 明朝数字**（`font-heading text-2xl tabular-nums text-primary`）`{streak}` ＋ 小さく「日連続記入中」（light `text-background/80`／`dark:text-muted-foreground`）。数字は24px大型なので墨地でも AAラージ(≥3:1)を満たす（実測 約3.7:1）。
+  - ※ PR2-B 当初は `bg-card`（生成り薄地）＋墨数字だったが、提案モック（墨ベタ＋若葉数字）に寄せるため **PR2-D** で本仕様へ更新。
 - `history/page.tsx`：現在の `mb-6 flex flex-wrap items-baseline gap-3`（h1＋絵文字バッジ横並び）を**解体**し、**h1 を単独**にして、その下（カレンダーの上）に `<StreakBadge streak={streak} />` を**縦積み**で置く（横長カードなので baseline 横並びに馴染まない）。例：`<h1 className="mb-4 text-2xl font-bold">日記の履歴</h1>` の後に `{streak > 0 && <div className="mb-6"><StreakBadge streak={streak} /></div>}`。見出しは base ルールで明朝。
 
 ## ⑥ 見本帳（`/dev/design`）
