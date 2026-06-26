@@ -12,12 +12,22 @@ describe('findColorLiterals', () => {
   });
 
   it('トークン/許可パターンは検出しない（must-pass）', () => {
-    expect(findColorLiterals('className="text-muted-foreground/30"')).toEqual([]);
+    expect(findColorLiterals('className="text-muted-foreground/30"')).toEqual(
+      [],
+    );
     expect(
-      findColorLiterals('color-mix(in oklab, var(--center-gut) 15%, transparent)'),
+      findColorLiterals(
+        'color-mix(in oklab, var(--center-gut) 15%, transparent)',
+      ),
     ).toEqual([]);
-    expect(findColorLiterals('className="min-h-[15rem] max-w-[260px]"')).toEqual([]);
-    expect(findColorLiterals('borderLeftColor: "var(--center-head)"')).toEqual([]);
-    expect(findColorLiterals('className="bg-primary text-foreground"')).toEqual([]);
+    expect(
+      findColorLiterals('className="min-h-[15rem] max-w-[260px]"'),
+    ).toEqual([]);
+    expect(findColorLiterals('borderLeftColor: "var(--center-head)"')).toEqual(
+      [],
+    );
+    expect(findColorLiterals('className="bg-primary text-foreground"')).toEqual(
+      [],
+    );
   });
 });
