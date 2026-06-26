@@ -25,7 +25,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
     },
   });
 
-  if (!editor || !state) return null;
+  if (!editor) return null;
 
   // タップ時にエディタの選択が外れないようにする（iOS Safari の定番対策）
   const keepSelection = (event: { preventDefault: () => void }) =>
@@ -36,8 +36,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <Button
         type="button"
         size="sm"
-        variant={state.isH2 ? 'secondary' : 'ghost'}
-        aria-pressed={state.isH2}
+        variant={state?.isH2 ? 'secondary' : 'ghost'}
+        aria-pressed={state?.isH2 ?? false}
         onMouseDown={keepSelection}
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
       >
@@ -46,8 +46,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <Button
         type="button"
         size="sm"
-        variant={state.isH3 ? 'secondary' : 'ghost'}
-        aria-pressed={state.isH3}
+        variant={state?.isH3 ? 'secondary' : 'ghost'}
+        aria-pressed={state?.isH3 ?? false}
         onMouseDown={keepSelection}
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
       >
@@ -57,8 +57,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <Button
         type="button"
         size="icon-sm"
-        variant={state.isBold ? 'secondary' : 'ghost'}
-        aria-pressed={state.isBold}
+        variant={state?.isBold ? 'secondary' : 'ghost'}
+        aria-pressed={state?.isBold ?? false}
         aria-label="太字"
         onMouseDown={keepSelection}
         onClick={() => editor.chain().focus().toggleBold().run()}
@@ -68,8 +68,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <Button
         type="button"
         size="icon-sm"
-        variant={state.isItalic ? 'secondary' : 'ghost'}
-        aria-pressed={state.isItalic}
+        variant={state?.isItalic ? 'secondary' : 'ghost'}
+        aria-pressed={state?.isItalic ?? false}
         aria-label="斜体"
         onMouseDown={keepSelection}
         onClick={() => editor.chain().focus().toggleItalic().run()}
@@ -80,8 +80,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <Button
         type="button"
         size="icon-sm"
-        variant={state.isBullet ? 'secondary' : 'ghost'}
-        aria-pressed={state.isBullet}
+        variant={state?.isBullet ? 'secondary' : 'ghost'}
+        aria-pressed={state?.isBullet ?? false}
         aria-label="箇条書き"
         onMouseDown={keepSelection}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -91,8 +91,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <Button
         type="button"
         size="icon-sm"
-        variant={state.isOrdered ? 'secondary' : 'ghost'}
-        aria-pressed={state.isOrdered}
+        variant={state?.isOrdered ? 'secondary' : 'ghost'}
+        aria-pressed={state?.isOrdered ?? false}
         aria-label="番号付きリスト"
         onMouseDown={keepSelection}
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
@@ -102,8 +102,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <Button
         type="button"
         size="icon-sm"
-        variant={state.isQuote ? 'secondary' : 'ghost'}
-        aria-pressed={state.isQuote}
+        variant={state?.isQuote ? 'secondary' : 'ghost'}
+        aria-pressed={state?.isQuote ?? false}
         aria-label="引用"
         onMouseDown={keepSelection}
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
