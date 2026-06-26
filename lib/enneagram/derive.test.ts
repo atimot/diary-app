@@ -6,7 +6,11 @@ import {
   typeCode,
   wing,
 } from './derive';
-import type { EnneagramScores, EnneagramTypeNumber } from './types';
+import {
+  type EnneagramScores,
+  type EnneagramTypeNumber,
+  isEnneagramScores,
+} from './types';
 
 function scores(
   partial: Partial<Record<EnneagramTypeNumber, number>>,
@@ -73,6 +77,34 @@ describe('topTypes', () => {
       { type: 3, score: 0.5 },
       { type: 7, score: 0.5 },
     ]);
+  });
+});
+
+describe('isEnneagramScores', () => {
+  it('accepts a full 9-key numeric scores object', () => {
+    expect(isEnneagramScores(scores({ 9: 0.8, 1: 0.4 }))).toBe(true);
+  });
+
+  it('rejects an MBTI-shaped object', () => {
+    expect(isEnneagramScores({ EI: 0.5, SN: -0.2, TF: 0.1, JP: 0 })).toBe(
+      false,
+    );
+  });
+
+  it('rejects when a type key is missing', () => {
+    expect(
+      isEnneagramScores({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 }),
+    ).toBe(false);
+  });
+
+  it('rejects non-number or non-finite values', () => {
+    expect(isEnneagramScores({ ...scores({}), 5: 'x' })).toBe(false);
+    expect(isEnneagramScores({ ...scores({}), 3: Number.NaN })).toBe(false);
+  });
+
+  it('rejects null and non-objects', () => {
+    expect(isEnneagramScores(null)).toBe(false);
+    expect(isEnneagramScores(42)).toBe(false);
   });
 });
 

@@ -21,6 +21,18 @@ export const ENNEAGRAM_TYPE_NUMBERS: EnneagramTypeNumber[] = [
   1, 2, 3, 4, 5, 6, 7, 8, 9,
 ];
 
+// jsonb から読み出した scores が、9タイプ揃った有効な親和度かを検証する。
+// 旧 MBTI 形式（{EI,SN,TF,JP}）の残存行などを、描画前に弾くためのガード。
+export function isEnneagramScores(value: unknown): value is EnneagramScores {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  return ENNEAGRAM_TYPE_NUMBERS.every(
+    (n) => typeof obj[n] === 'number' && Number.isFinite(obj[n]),
+  );
+}
+
 export const CENTER_LABELS: Record<EnneagramCenter, string> = {
   gut: '本能（腹）',
   heart: '感情（心）',

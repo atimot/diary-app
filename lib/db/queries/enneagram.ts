@@ -3,6 +3,7 @@ import { desc, eq } from 'drizzle-orm';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@/lib/db/client';
 import { type EnneagramSnapshot, enneagramSnapshots } from '@/lib/db/schema';
+import { isEnneagramScores } from '@/lib/enneagram/types';
 
 export async function getLatestEnneagramSnapshot(): Promise<
   EnneagramSnapshot | undefined
@@ -18,5 +19,10 @@ export async function getLatestEnneagramSnapshot(): Promise<
       desc(enneagramSnapshots.createdAt),
     )
     .limit(1);
-  return rows[0];
+  const row = rows[0];
+  // 不正な形状（旧 MBTI 残存行など）は未生成扱いにし、NaN 描画を防ぐ。
+  if (row && !isEnneagramScores(row.scores)) {
+    return undefined;
+  }
+  return row;
 }

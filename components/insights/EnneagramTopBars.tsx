@@ -1,5 +1,6 @@
 import type { TypeScore } from '@/lib/enneagram/derive';
 import { CENTER_COLOR_VARS, ENNEAGRAM_TYPES } from '@/lib/enneagram/types';
+import { BarTrack, MeterFill } from './MeterBar';
 
 interface EnneagramTopBarsProps {
   items: TypeScore[];
@@ -26,16 +27,13 @@ export function EnneagramTopBars({ items }: EnneagramTopBarsProps) {
                 {pct}
               </span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-muted">
-              <div
-                className="h-full rounded-full"
-                style={{
-                  width: `${(item.score * 100).toFixed(1)}%`,
-                  backgroundColor: color,
-                  opacity: i === 0 ? 1 : 0.6,
-                }}
+            <BarTrack>
+              <MeterFill
+                value={item.score}
+                color={color}
+                opacity={i === 0 ? 1 : 0.6}
               />
-            </div>
+            </BarTrack>
           </div>
         );
       })}

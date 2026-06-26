@@ -1,5 +1,6 @@
 import type { CenterBreakdown } from '@/lib/enneagram/derive';
 import { CENTER_COLOR_VARS, CENTER_LABELS } from '@/lib/enneagram/types';
+import { BarTrack } from './MeterBar';
 
 interface EnneagramCentersProps {
   breakdown: CenterBreakdown;
@@ -10,7 +11,7 @@ export function EnneagramCenters({ breakdown }: EnneagramCentersProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex h-4 overflow-hidden rounded-full bg-muted">
+      <BarTrack height="h-4" className="flex">
         {breakdown.centers.map((c) => (
           <div
             key={c.center}
@@ -20,7 +21,7 @@ export function EnneagramCenters({ breakdown }: EnneagramCentersProps) {
             }}
           />
         ))}
-      </div>
+      </BarTrack>
       <ul className="space-y-1.5 text-sm">
         {ranked.map((c) => (
           <li key={c.center} className="flex items-center gap-2">
