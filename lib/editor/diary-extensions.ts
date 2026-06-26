@@ -1,5 +1,6 @@
+import type { Extensions } from '@tiptap/core';
+
 import { Markdown } from '@tiptap/markdown';
-import type { Extensions } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 
 // 日記エディタで使う Tiptap 拡張。見出しは H2/H3 のみに制限し、

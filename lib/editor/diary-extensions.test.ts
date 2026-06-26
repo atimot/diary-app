@@ -26,11 +26,12 @@ describe('createDiaryEditorExtensions', () => {
   });
 
   it('### を level 3 見出しとして解釈する', () => {
-    const { json } = parse('### 見出し3');
+    const { json, remarkdown } = parse('### 見出し3');
     expect(json.content?.[0]).toMatchObject({
       type: 'heading',
       attrs: { level: 3 },
     });
+    expect(remarkdown).toContain('### 見出し3');
   });
 
   it('太字と斜体マークを往復できる', () => {
