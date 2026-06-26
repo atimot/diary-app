@@ -6,7 +6,7 @@ export interface ColorLiteralMatch {
 
 // 生の色リテラルだけを検出する:
 //  - 16進カラー #rgb / #rgba / #rrggbb / #rrggbbaa（5,7桁は色ではないので除外）
-//  - 関数記法 rgb()/rgba()/hsl()/hsla()/oklch()/oklab()（直後に "(" が来る場合のみ）
+//  - 関数記法（rgb・rgba・hsl・hsla・oklch・oklab のいずれかに開き括弧が続くもの）
 // var(--token) / color-mix(in oklab, var(--..) ..) / Tailwind の named color・不透明度修飾子・
 // 任意サイズ値（色でない [15rem] 等）は検出しない。
 const COLOR_LITERAL =

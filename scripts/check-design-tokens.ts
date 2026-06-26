@@ -4,7 +4,7 @@ import { findColorLiterals } from '../lib/design/color-literals';
 
 // 走査対象ルートと除外ディレクトリ（spec §⑦）。
 const ROOTS = ['app', 'components', 'lib'];
-const EXCLUDE_DIRS = ['components/ui', 'app/dev', 'lib/design'];
+const EXCLUDE_DIRS = ['components/ui', 'app/dev'];
 
 const isScannable = (p: string) =>
   /\.(ts|tsx)$/.test(p) && !/\.test\.(ts|tsx)$/.test(p);
@@ -41,7 +41,7 @@ for (const root of ROOTS) {
 
 if (violations > 0) {
   console.error(
-    `\n✗ ${violations} 件の色リテラルを検出（許可: app/globals.css, components/ui/**, app/dev/**）`,
+    `\n✗ ${violations} 件の色リテラルを検出（許可: components/ui/**, app/dev/**。CSS等の非.ts/.tsxは元々対象外）`,
   );
   process.exit(1);
 }
