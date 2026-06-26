@@ -18,15 +18,15 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.80",
-    "@base-ui/react": "^1.5.0",
+    "@base-ui/react": "^1.6.0",
     "@neondatabase/serverless": "^1.1.0",
     "@vercel/speed-insights": "^2.0.0",
     "ai": "^6.0.200",
-    "better-auth": "^1.6.16",
+    "better-auth": "^1.6.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
-    "lucide-react": "^1.17.0",
+    "lucide-react": "^1.21.0",
     "next": "16.2.9",
     "react": "19.2.7",
     "react-dom": "19.2.7",
@@ -38,8 +38,8 @@
     "zod": "^4.4.3"
   },
   "overrides": {
-    "@emnapi/core": "1.11.0",
-    "@emnapi/runtime": "1.11.0",
+    "@emnapi/core": "1.11.1",
+    "@emnapi/runtime": "1.11.1",
     "@emnapi/wasi-threads": "1.2.2",
     "next": {
       "postcss": "^8.5.10"
@@ -49,16 +49,16 @@
     }
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.16",
-    "@emnapi/core": "1.11.0",
-    "@emnapi/runtime": "1.11.0",
+    "@biomejs/biome": "2.5.1",
+    "@emnapi/core": "1.11.1",
+    "@emnapi/runtime": "1.11.1",
     "@emnapi/wasi-threads": "1.2.2",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^24.13.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@vitest/coverage-v8": "^4.1.8",
+    "@vitest/coverage-v8": "^4.1.9",
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "tailwindcss": "^4",
