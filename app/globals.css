@@ -73,7 +73,7 @@
   --border: #e0d9cc;
   --input: #e0d9cc;
   --ring: #5f7a4f;
-  --center-gut: oklch(0.58 0.085 75);
+  --center-gut: oklch(0.55 0.085 75);
   --center-heart: oklch(0.52 0.12 25);
   --center-head: oklch(0.44 0.09 255);
   --chart-1: oklch(0.87 0 0);
