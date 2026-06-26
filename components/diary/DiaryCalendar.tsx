@@ -116,7 +116,7 @@ export function DiaryCalendar({
           className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
           aria-label="前月"
         >
-          ← {prev.year}年{prev.month}月
+          {prev.year}年{prev.month}月
         </Link>
         <h2 className="text-lg font-semibold">
           {year}年{month}月
@@ -126,7 +126,7 @@ export function DiaryCalendar({
           className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
           aria-label="翌月"
         >
-          {next.year}年{next.month}月 →
+          {next.year}年{next.month}月
         </Link>
       </div>
 
