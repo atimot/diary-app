@@ -30,7 +30,7 @@ const RichTextEditor = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="min-h-[15rem] animate-pulse rounded-lg border border-input" />
+      <div className="min-h-[15rem] animate-pulse rounded-xl border" />
     ),
   },
 );
@@ -106,9 +106,13 @@ export function DiaryEditor({
         onValueChange={(value) => setActiveTab(value as 'edit' | 'preview')}
         className="w-full"
       >
-        <TabsList>
-          <TabsTrigger value="edit">編集</TabsTrigger>
-          <TabsTrigger value="preview">プレビュー</TabsTrigger>
+        <TabsList variant="line">
+          <TabsTrigger value="edit" className="after:bg-primary">
+            編集
+          </TabsTrigger>
+          <TabsTrigger value="preview" className="after:bg-primary">
+            プレビュー
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="edit">
@@ -124,7 +128,7 @@ export function DiaryEditor({
         </TabsContent>
 
         <TabsContent value="preview">
-          <div className="min-h-[15rem] rounded-md border p-4">
+          <div className="min-h-[15rem] rounded-xl border bg-card p-5">
             {activeTab === 'preview' && <DiaryMarkdown content={content} />}
           </div>
         </TabsContent>
@@ -182,7 +186,7 @@ export function DiaryEditor({
           <span
             className={
               feedback.kind === 'success'
-                ? 'text-sm text-green-600 dark:text-green-400'
+                ? 'text-sm text-muted-foreground'
                 : 'text-sm text-destructive'
             }
           >

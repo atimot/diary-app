@@ -160,3 +160,14 @@
   float: left;
   height: 0;
 }
+
+/* 編集(Tiptap)・表示(react-markdown)双方が .prose を使うため1か所で和モダン化。
+   見出し明朝は PR1 の base ルールでも効くが、レイヤ順の取りこぼし回避に明示する
+   (typography プラグインは font-family を設定しないので競合しない)。
+   .prose 利用は現状日記のみ。将来 prose を使う画面にも同じ読み物体裁が乗るのは望ましい。 */
+.prose :is(h1, h2, h3) {
+  font-family: var(--font-heading);
+}
+.prose p {
+  line-height: 1.9;
+}

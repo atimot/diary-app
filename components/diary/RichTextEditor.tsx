@@ -35,7 +35,7 @@ export function RichTextEditor({
   });
 
   return (
-    <div className="rounded-lg border border-input bg-transparent">
+    <div className="rounded-xl border bg-transparent">
       <EditorToolbar editor={editor} />
       <EditorContent editor={editor} />
     </div>

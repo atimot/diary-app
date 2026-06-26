@@ -1,5 +1,6 @@
 // app/diary/[date]/page.tsx
 import { notFound } from 'next/navigation';
+import { DiaryDateHeader } from '@/components/diary/DiaryDateHeader';
 import { DiaryEditor } from '@/components/diary/DiaryEditor';
 import { todayInTokyo } from '@/lib/calendar/month-grid';
 import { getDiaryEntry } from '@/lib/db/queries/diary';
@@ -27,7 +28,7 @@ export default async function DiaryDetailPage({ params }: PageProps) {
 
   return (
     <main className="container mx-auto max-w-3xl p-6">
-      <h1 className="mb-6 text-2xl font-bold">{date}</h1>
+      <DiaryDateHeader date={date} />
       <DiaryEditor
         entryDate={date}
         initialContent={initialContent}
