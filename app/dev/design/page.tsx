@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { DiaryDateHeader } from '@/components/diary/DiaryDateHeader';
+import { StreakBadge } from '@/components/diary/StreakBadge';
 import { BarTrack, MeterFill } from '@/components/insights/MeterBar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -171,6 +172,10 @@ function Showcase() {
       <section className="space-y-3">
         <h2>カレンダーのセル状態</h2>
         <CalendarCells />
+      </section>
+      <section className="space-y-3">
+        <h2>連続記入バッジ</h2>
+        <StreakBadge streak={12} />
       </section>
     </div>
   );
