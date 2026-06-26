@@ -1,6 +1,6 @@
 import { EnneagramTrends } from '@/components/insights/EnneagramTrends';
 import { RegenerateButton } from '@/components/insights/RegenerateButton';
-import { listDiaryEntries } from '@/lib/db/queries/diary';
+import { countDiaryEntries } from '@/lib/db/queries/diary';
 import { getLatestEnneagramSnapshot } from '@/lib/db/queries/enneagram';
 import { getLatestInsight } from '@/lib/db/queries/insight';
 
@@ -18,15 +18,15 @@ function formatDateTime(value: Date): string {
 }
 
 export default async function InsightsPage() {
-  const [entries, insight, enneagram] = await Promise.all([
-    listDiaryEntries(),
+  const [entryCount, insight, enneagram] = await Promise.all([
+    countDiaryEntries(),
     getLatestInsight(),
     getLatestEnneagramSnapshot(),
   ]);
 
   // state 1: 件数不足
-  if (entries.length < MIN_ENTRIES) {
-    const remaining = MIN_ENTRIES - entries.length;
+  if (entryCount < MIN_ENTRIES) {
+    const remaining = MIN_ENTRIES - entryCount;
     return (
       <main className="container mx-auto max-w-3xl p-6">
         <h1 className="mb-6 text-2xl font-bold">あなたの傾向</h1>
@@ -44,7 +44,7 @@ export default async function InsightsPage() {
       <main className="container mx-auto max-w-3xl p-6">
         <h1 className="mb-6 text-2xl font-bold">あなたの傾向</h1>
         <p className="mb-4 text-muted-foreground">
-          日記が {entries.length} 件溜まりました。AI
+          日記が {entryCount} 件溜まりました。AI
           に最近の傾向を分析させてみましょう。
         </p>
         <RegenerateButton label="AI に分析させる" pendingLabel="分析中…" />

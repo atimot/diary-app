@@ -1,5 +1,6 @@
 // components/diary/DiaryCalendar.tsx
 import Link from 'next/link';
+import { CalendarDayLink } from '@/components/diary/CalendarDayLink';
 import {
   buildMonthGrid,
   type CalendarCell,
@@ -56,14 +57,14 @@ function DayCell({ cell, written }: { cell: CalendarCell; written: boolean }) {
 
   if (written) {
     return (
-      <Link
+      <CalendarDayLink
         href={`/diary/${cell.iso}`}
         className={className}
         aria-current={cell.isToday ? 'date' : undefined}
         aria-label={`${cell.iso} の日記を見る`}
       >
         {cell.day}
-      </Link>
+      </CalendarDayLink>
     );
   }
 
@@ -82,13 +83,13 @@ function DayCell({ cell, written }: { cell: CalendarCell; written: boolean }) {
 
   // Past day without an entry — clickable to backdate
   return (
-    <Link
+    <CalendarDayLink
       href={`/diary/${cell.iso}`}
       className={className}
       aria-label={`${cell.iso} に日記を書く`}
     >
       {cell.day}
-    </Link>
+    </CalendarDayLink>
   );
 }
 
