@@ -108,7 +108,7 @@ export default function EnneagramPreviewPage() {
             リンク
           </Button>
           <span className="rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-sm">
-            🔥 7日連続記入中
+            7日連続記入中
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-4 text-sm">

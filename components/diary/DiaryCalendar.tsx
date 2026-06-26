@@ -8,6 +8,7 @@ import {
   nextMonth,
   prevMonth,
 } from '@/lib/calendar/month-grid';
+import { wafuMonthName } from '@/lib/calendar/wafu-month';
 
 interface DiaryCalendarProps {
   year: number;
@@ -19,10 +20,14 @@ interface DiaryCalendarProps {
 
 const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土'];
 
-function cellClasses(args: { cell: CalendarCell; written: boolean }): string {
-  const { cell, written } = args;
+function cellClasses(args: {
+  cell: CalendarCell;
+  written: boolean;
+  isSunday: boolean;
+}): string {
+  const { cell, written, isSunday } = args;
   const base =
-    'aspect-square flex items-center justify-center rounded-md text-sm';
+    'aspect-square flex items-center justify-center rounded-lg text-sm';
 
   if (!cell.inMonth) {
     return `${base} text-muted-foreground/30`;
@@ -41,11 +46,20 @@ function cellClasses(args: { cell: CalendarCell; written: boolean }): string {
   if (cell.isToday) {
     return `${base} ring-2 ring-primary text-foreground hover:bg-accent transition`;
   }
-  return `${base} text-muted-foreground hover:bg-accent transition`;
+  // 未記入・当月・過去・非today。日曜だけ朱。
+  return `${base} ${isSunday ? 'text-season' : 'text-muted-foreground'} hover:bg-accent transition`;
 }
 
-function DayCell({ cell, written }: { cell: CalendarCell; written: boolean }) {
-  const className = cellClasses({ cell, written });
+function DayCell({
+  cell,
+  written,
+  isSunday,
+}: {
+  cell: CalendarCell;
+  written: boolean;
+  isSunday: boolean;
+}) {
+  const className = cellClasses({ cell, written, isSunday });
 
   if (!cell.inMonth || cell.isFuture) {
     return (
@@ -118,8 +132,11 @@ export function DiaryCalendar({
         >
           {prev.year}年{prev.month}月
         </Link>
-        <h2 className="text-lg font-semibold">
-          {year}年{month}月
+        <h2 className="text-center">
+          <span className="font-heading text-lg">{wafuMonthName(month)}</span>
+          <span className="block text-xs font-normal text-muted-foreground tabular-nums">
+            {year}年{month}月
+          </span>
         </h2>
         <Link
           href={nextHref}
@@ -142,19 +159,20 @@ export function DiaryCalendar({
       )}
 
       <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground">
-        {WEEKDAY_LABELS.map((label) => (
-          <div key={label} className="py-1">
+        {WEEKDAY_LABELS.map((label, i) => (
+          <div key={label} className={i === 0 ? 'py-1 text-season' : 'py-1'}>
             {label}
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-7 gap-1">
-        {grid.weeks.flat().map((cell) => (
+        {grid.weeks.flat().map((cell, index) => (
           <DayCell
             key={cell.iso}
             cell={cell}
             written={writtenDates.has(cell.iso)}
+            isSunday={index % 7 === 0}
           />
         ))}
       </div>
@@ -171,6 +189,10 @@ export function DiaryCalendar({
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-3 w-3 rounded-sm ring-2 ring-primary" />
           今日
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="font-medium text-season">日</span>
+          日曜
         </span>
       </div>
     </div>

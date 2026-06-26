@@ -1,6 +1,7 @@
 // app/history/page.tsx
 
 import { DiaryCalendar } from '@/components/diary/DiaryCalendar';
+import { StreakBadge } from '@/components/diary/StreakBadge';
 import {
   formatYearMonth,
   parseYearMonth,
@@ -31,14 +32,12 @@ export default async function HistoryPage({ searchParams }: PageProps) {
 
   return (
     <main className="container mx-auto max-w-3xl p-6">
-      <div className="mb-6 flex flex-wrap items-baseline gap-3">
-        <h1 className="text-2xl font-bold">日記の履歴</h1>
-        {streak > 0 && (
-          <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-            🔥 {streak}日連続記入中
-          </span>
-        )}
-      </div>
+      <h1 className="mb-4 text-2xl font-bold">日記の履歴</h1>
+      {streak > 0 && (
+        <div className="mb-6">
+          <StreakBadge streak={streak} />
+        </div>
+      )}
       <DiaryCalendar
         year={year}
         month={month}
