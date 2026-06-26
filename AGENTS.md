@@ -48,6 +48,12 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 - 1 回の `regenerateInsight` で insight + MBTI を 2 リクエスト叩いていた時期があるが、1 リクエストに統合して緩和済み（`lib/ai/combined-insight.ts`）。
 - 429 catch 時は「1分ほど待ってから再試行」のメッセージを返す（`lib/actions/insight.ts` の `isRateLimitError`）。
 
+## Tiptap（日記エディタ）
+- 入力 UI は Tiptap v3（`@tiptap/react` + `@tiptap/starter-kit` + 公式 `@tiptap/markdown`）。保存は従来通り Markdown 文字列で、表示は `react-markdown` のまま。
+- `@tiptap/core` / `@tiptap/pm` / `@tiptap/react` / `@tiptap/starter-kit` / `@tiptap/markdown` は **peer が exact pin**。5 つは常に同一バージョンに揃える。Dependabot 更新時もまとめて上げる（1 つだけ上がると実行時エラー）。
+- `useEditor` には必ず `immediatelyRender: false`（App Router の SSR エラー回避）。
+- エディタ設定は `lib/editor/diary-extensions.ts` に集約。見出しは H2/H3 のみ。
+
 ## shadcn / Tailwind v4
 - このプロジェクトは shadcn の `base-nova` スタイル + **`@base-ui/react`**（Radix UI ではない）を使う。
 - `--primary` 等の CSS 変数は `oklch()` で定義されている。SVG / SVG 風コードで `var(--primary)` を直接使う。`hsl(var(--primary))` は無効。
