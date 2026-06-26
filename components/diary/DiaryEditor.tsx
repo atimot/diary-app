@@ -4,6 +4,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { DiaryMarkdown } from '@/components/diary/DiaryMarkdown';
+import { RichTextEditor } from '@/components/diary/RichTextEditor';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +18,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 import { deleteDiaryEntry, saveDiaryEntry } from '@/lib/actions/diary';
 
 interface DiaryEditorProps {
@@ -86,12 +86,11 @@ export function DiaryEditor({
         </TabsList>
 
         <TabsContent value="edit">
-          <Textarea
+          <RichTextEditor
+            key={entryDate}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={15}
+            onChange={setContent}
             placeholder="今日はどんな1日でしたか？"
-            className="w-full"
           />
         </TabsContent>
 
