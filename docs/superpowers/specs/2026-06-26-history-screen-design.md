@@ -38,24 +38,27 @@ wafuMonthName(month: number): string  // 1..12 → 睦月..師走
   - 和風月名：`font-heading`（明朝）、`text-lg`、`{wafuMonthName(month)}`。
   - 年月：`block text-xs text-muted-foreground tabular-nums`、`{year}年{month}月`。
 - 前月/翌月リンクは現状維持（token 適合済み。`{prev.year}年{prev.month}月` 等）。「今月へ」も維持。
+- `wafuMonthName(month)` の `month` は `DiaryCalendar` の `month` prop をそのまま渡す。月送りは URL `?ym=YYYY-MM` 連動で Server Component が再レンダリングし `year`/`month` が表示月に更新されるため、和風月名も自動追従する。
 
 ## ③ 曜日ヘッダ・日曜の朱（`DiaryCalendar`）
 
 - 曜日ヘッダ（`WEEKDAY_LABELS` を回す箇所）で **index 0（日）に `text-season`**、他は `text-muted-foreground`。
-- 日付セルの色分け（`cellClasses`）に **日曜（週の先頭列）判定**を渡し、「未記入・当月・過去（非today）の日曜」を `text-muted-foreground`→`text-season` にする。判定は週が日曜始まり7列固定なので、`grid.weeks.flat()` の **index % 7 === 0** を `isSunday` として `DayCell`/`cellClasses` に渡す（iso再パース不要）。
+- 日付セルの色分け（`cellClasses`）に **日曜（週の先頭列）判定**を渡し、「未記入・当月・過去（非today）の日曜」を `text-muted-foreground`→`text-season` にする。判定は週が日曜始まり7列固定なので、`grid.weeks.flat().map((cell, index) => …)` の **index % 7 === 0** を `isSunday` として `DayCell` の新 prop 経由で `cellClasses` に渡す（iso再パース不要）。
+- **`!cell.inMonth`（前後月パディング）と `isFuture` のセルは `isSunday` によらず現状のまま**（パディング=`text-muted-foreground/30`、未来=`/50`）。`cellClasses` の既存の早期 return 分岐順を維持し、`isSunday`→`text-season` は「当月・過去・非today・未記入」の**最後の分岐にだけ**効かせる。
 - 記入日（`bg-primary`）・今日リング・未来/前後月は据え置き（日曜でも記入日は若葉ベタのまま＝データ優先）。
 
 ## ④ セル角丸（`DiaryCalendar`）
 
 - `cellClasses` の base `rounded-md` → `rounded-lg`。凡例（書いた日/書かなかった日/今日）の見本も整合させる（`rounded-sm` のままで可、または `rounded`）。凡例の色は token 据え置き。
+- 凡例に **「日曜（朱）」の見本を1つ追加**（`text-season`/`bg-season` の小四角＋「日曜」）して、日曜=朱の意味をユーザーに示す。
 
 ## ⑤ streak 表示（`app/history/page.tsx` ＋ 新規 `StreakBadge`）
 
 - 現状の `🔥 {streak}日連続記入中`（`bg-primary/10 ... text-primary` の絵文字バッジ）を廃止。
-- 新規 **`components/diary/StreakBadge.tsx`**（サーバーコンポーネント、props `streak: number`、`streak<=0` は `null`）：
-  - `rounded-xl border bg-card` の小カード。
+- 新規 **`components/diary/StreakBadge.tsx`**（サーバーコンポーネント、props `streak: number`、戻り型 `ReactElement | null`、`streak<=0` は `null`）：
+  - `rounded-xl border bg-card` の小カード（横長、`inline-flex items-center gap-3` 程度）。
   - lucide `Flame`（`text-primary`＝若葉）＋ **明朝の大型 tabular 数字**（`font-heading text-2xl tabular-nums`）`{streak}` ＋ 小さく「日連続記入中」（`text-sm text-muted-foreground`）。
-- `history/page.tsx`：見出し行から絵文字バッジを外し、`<StreakBadge streak={streak} />` を見出しの下（カレンダーの上）に配置。見出し「日記の履歴」は h1（base ルールで明朝）。
+- `history/page.tsx`：現在の `mb-6 flex flex-wrap items-baseline gap-3`（h1＋絵文字バッジ横並び）を**解体**し、**h1 を単独**にして、その下（カレンダーの上）に `<StreakBadge streak={streak} />` を**縦積み**で置く（横長カードなので baseline 横並びに馴染まない）。例：`<h1 className="mb-4 text-2xl font-bold">日記の履歴</h1>` の後に `{streak > 0 && <div className="mb-6"><StreakBadge streak={streak} /></div>}`。見出しは base ルールで明朝。
 
 ## ⑥ 見本帳（`/dev/design`）
 
@@ -70,7 +73,7 @@ wafuMonthName(month: number): string  // 1..12 → 睦月..師走
 ## 検証
 
 - `wafuMonthName` は TDD（vitest、`lib/**/*.test.ts` 自動収集）。
-- `npm run lint` / `npm run lint:design`（絵文字除去・色リテラル増やさない）/ `npx tsc --noEmit` / `npm run test` / `npm run build` 全 green。
+- `npm run lint` / `npm run lint:design`（色リテラルを増やさない。※`lint:design` は絵文字を対象にしないので、`grep -rn '🔥' app components` 等で 🔥 が残っていないことを別途確認）/ `npx tsc --noEmit` / `npm run test` / `npm run build` 全 green。
 - 履歴画面の確認（本番/preview か可能なら dev）：和風月名（明朝）、日曜が朱、記入日が若葉、今日リング、streak カードの明朝大型数字、月送り、ライト/ダーク両方。
 - 憲法準拠：色トークンのみ、見出し明朝、意味色（若葉=記入/streak・朱=日曜）、影なし、ダーク対応。
 - PRベース：`claude/pr2-history` → CI green → squash merge（本番デプロイ）。
