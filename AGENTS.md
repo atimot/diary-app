@@ -35,10 +35,12 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 
 ## パフォーマンス: クライアントJS / プリフェッチ（体感の重さ）
 - 実測（本番・実ブラウザの Resource Timing）でホーム `/` は **JS 解凍後 1.37MB**、最大チャンク 648KB が **Tiptap/ProseMirror(+marked)**。`DiaryEditor` が `RichTextEditor` を静的 import していたため、閲覧（preview）でもエディタを丸ごと読んでいた。
-- **対策**: `DiaryEditor`（`'use client'`）内で `RichTextEditor` / `DiaryMarkdown` を `next/dynamic(ssr:false)` 化し、`{activeTab === 'edit' && …}` で**タブ選択時のみマウント**。これで `/` の First Load JS が 1393KB→784KB（約44%減）。`immediatelyRender:false` 済みなので ssr:false 化は安全。`content` は hidden input 経由で送るのでエディタ unmount でも保存は壊れない。
+- **対策**: `DiaryEditor`（`'use client'`）内で `RichTextEditor` / `DiaryMarkdown` を `next/dynamic` でコード分割し、`{activeTab === … && …}` で**タブ選択時のみマウント**。これで `/` の First Load JS が 1393KB→784KB（約44%減、転送 gz 427→250KB）。`content` は hidden input 経由で送るのでエディタ unmount でも保存は壊れない。
+  - **`RichTextEditor`(Tiptap) は `ssr:false` 必須**（`immediatelyRender:false` + browser API 依存）。編集タブを開くまで読まない。
+  - **`DiaryMarkdown`(react-markdown) は `ssr` 既定(true)のまま**にする。`ssr:false` にするとプレビュー本文がSSRされず（生HTMLに `.prose` が乗らず）スケルトンのちらつき／背景タブ空表示になる（`#33` で踏んで `#35` で修正）。dynamic は維持するので新規エントリ（編集タブ既定）では chunk を読まない。
 - `/history` は実測 **89 リクエスト中 50 が `/diary/*` の RSC プリフェッチ**（`?_rsc=`）。`DiaryCalendar` の全セル `<Link>` を App Router 既定の viewport プリフェッチが一斉発火させ、各々が動的ルート(sin1 関数+DB)を叩いていた。
   - **対策**: 日付セルだけ `components/diary/CalendarDayLink.tsx`（`prefetch={active ? null : false}` の hover/touch プリフェッチ）に置換。月送り等のナビ `<Link>` は据え置き。
-- **`loading.tsx` を全ルートに追加**（`app/loading.tsx` + history/insights）。動的(ƒ)レンダリングのサーバー応答（cold 〜780ms）待ちを即スケルトンで隠す。`loading.tsx` 不在だと真っ白待ち＝体感の重さに直結。
+- **`loading.tsx` は入れない**（`#33` で全ルートに追加したが `#36` で撤去）。サーバー応答が warm ~270ms と速いと、遷移のたびにスケルトンが「出てすぐ消える＝点滅」になり**チラつき**として体感される（実測: `/`→`/history` 遷移で `animate-pulse` が47個一斉表示）。`loading.tsx` 不在なら App Router は**遷移中は現在のページを表示したまま**、新ページ準備後に差し替えるのでチラつかない。cold（~780ms）時の無反応が気になるなら、全画面スケルトンではなく上部の細いプログレスバー等の控えめな手段を検討する。
 - クエリは**使う列だけ**。`/history` は `listEntryDates()`（entryDate のみ）、`/insights` の件数判定は `countDiaryEntries()`（`count(*)`）。`listDiaryEntries()`（本文全件）は AI 分析（`regenerateInsight`）が本文を使うので残す。
 - **誤検知に注意**: 「CSS 12 ファイル 251KB・圧縮未効き」は計測アーティファクト（Deployment Protection の SSO ゲート越し or dev ビルド）。実ビルドは 2 ファイル 167KB（gz 後約45KB）で minify＆圧縮済み。Vercel は静的アセットを自動で br/gzip 圧縮し `/_next/static/*` に `immutable` を付与する（手当て不要）。`lucide-react` も Next.js 16 の `optimizePackageImports` 既定対象（追加不要）。
 
