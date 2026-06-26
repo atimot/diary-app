@@ -23,6 +23,16 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 - セッション取得は `/api/auth/get-session`（古いプランで `/api/auth/session` と書きがちだが、それは 404）
 - `toNextJsHandler` は `GET, POST, PATCH, PUT, DELETE` の 5 つを返す。プランで GET/POST だけ書いた場合でも全部 export してよい。
 
+## パフォーマンス: リージョン同居と DB ドライバ（本番TTFB）
+- **症状**: 本番の各ページ LCP が悪い（実測 `/history` で 4.37s）。SQL 実行自体は EXPLAIN で 0.02〜0.07ms と速く、遅延はほぼ全部ネットワーク（リージョン間 RTT）だった。
+- **原因**: 関数=`iad1`（米東部・デフォルト）、Neon DB=`aws-ap-southeast-1`（シンガポール）、ユーザー/エッジ=`hnd1`（東京）の三角形。関数↔DB が太平洋横断で、1ページに複数往復（getSession + データ取得）乗っていた。
+- **対策（最重要は関数と DB の同居）**:
+  - `vercel.json` に `"regions": ["sin1"]`（= AWS ap-southeast-1 = Neon と物理同一）。Hobby plan は単一リージョン指定可。**関数↔ユーザーの距離より、関数↔DB の同居が優先**（DB は何往復もするため）。
+  - **Neon は作成後リージョン変更不可**で、かつ Asia は Singapore / Sydney のみ（**Tokyo は無い**）。よって「DB を東京へ」ではなく「関数を `sin1` へ」で同居させる。
+  - DB ドライバは **HTTP（`neon()` + `drizzle-orm/neon-http`）** を使う。WebSocket `Pool`（`neon-serverless`）は接続確立に複数 RTT かかり、サーバーレスの単発クエリに不利。`lib/db/client.ts` 参照。
+  - `neon-http` は **interactive `db.transaction()` 非対応**（呼ぶと throw）。本アプリは tx 未使用なので安全。複数文を原子的に実行したくなったら `db.batch([...])`。Better Auth の drizzle アダプタも transaction を実装せず、コアが no-op で patch するため neon-http で動く（`node_modules/better-auth/dist/db/adapter-base.mjs` の自動 patch）。
+- **Better Auth の `session.cookieCache`** を有効化（`lib/auth/server.ts`）。`requireSession()`=`getSession` の毎回 DB 照会を署名付き短命 cookie 読取りに置換。失効の即時性が `maxAge` ぶん遅れるが単一ユーザーなので許容。即時失効が要る所だけ `getSession({ query: { disableCookieCache: true } })`。
+
 ## Vercel + npm 運用
 - scaffold の `pnpm-workspace.yaml` が残っていると Vercel が pnpm install を試みて build 失敗する。npm 運用なら削除する。
 - 加えて `vercel.json` で `installCommand: "npm install"` を明示しておくと auto-detect の事故が起きない。
