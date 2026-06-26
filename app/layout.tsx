@@ -7,6 +7,7 @@ import {
   Zen_Kaku_Gothic_New,
 } from 'next/font/google';
 import { HeaderNav } from '@/components/layout/HeaderNav';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import './globals.css';
 
 const geistMono = Geist_Mono({
@@ -54,14 +55,17 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
+      suppressHydrationWarning
       className={`${zenKaku.variable} ${shipporiMincho.variable} ${notoSansJP.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <header className="border-b">
-          <HeaderNav />
-        </header>
-        {children}
-        <SpeedInsights />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <header className="border-b">
+            <HeaderNav />
+          </header>
+          {children}
+          <SpeedInsights />
+        </ThemeProvider>
       </body>
     </html>
   );
