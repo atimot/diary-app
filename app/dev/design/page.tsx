@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { DiaryDateHeader } from '@/components/diary/DiaryDateHeader';
 import { BarTrack, MeterFill } from '@/components/insights/MeterBar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -132,6 +133,10 @@ function CalendarCells() {
 function Showcase() {
   return (
     <div className="space-y-10">
+      <section className="space-y-3">
+        <h2>日付ヘッダ</h2>
+        <DiaryDateHeader date="2026-06-26" />
+      </section>
       <section className="space-y-3">
         <h2>カラートークン</h2>
         <Swatches />
