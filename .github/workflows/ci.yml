@@ -20,6 +20,8 @@ jobs:
 
       - run: npm run lint
 
+      - run: npm run lint:design
+
       - run: npx tsc --noEmit
 
       - run: npm run test
