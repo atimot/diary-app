@@ -72,14 +72,14 @@ export default async function InsightsPage() {
         <>
           <section className="space-y-2">
             <h2 className="text-lg font-semibold">最近のあなたの動向</h2>
-            <p className="whitespace-pre-wrap leading-relaxed">
+            <p className="whitespace-pre-wrap leading-loose">
               {insight.summary}
             </p>
           </section>
 
           <section className="space-y-2">
             <h2 className="text-lg font-semibold">ワンポイントアドバイス</h2>
-            <p className="whitespace-pre-wrap leading-relaxed">
+            <p className="whitespace-pre-wrap leading-loose">
               {insight.advice}
             </p>
           </section>

@@ -177,6 +177,36 @@ function Showcase() {
         <h2>連続記入バッジ</h2>
         <StreakBadge streak={12} />
       </section>
+      <section className="space-y-3">
+        <h2>エニアグラム中心色（データ分類専用）</h2>
+        <div className="flex gap-4">
+          <div className="space-y-1 text-center">
+            <div
+              className="h-12 w-16 rounded-lg border"
+              style={{ backgroundColor: 'var(--center-gut)' }}
+            />
+            <span className="block text-xs text-muted-foreground">
+              gut 黄土
+            </span>
+          </div>
+          <div className="space-y-1 text-center">
+            <div
+              className="h-12 w-16 rounded-lg border"
+              style={{ backgroundColor: 'var(--center-heart)' }}
+            />
+            <span className="block text-xs text-muted-foreground">
+              heart 茜
+            </span>
+          </div>
+          <div className="space-y-1 text-center">
+            <div
+              className="h-12 w-16 rounded-lg border"
+              style={{ backgroundColor: 'var(--center-head)' }}
+            />
+            <span className="block text-xs text-muted-foreground">head 藍</span>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
