@@ -1,4 +1,5 @@
 // components/diary/WritingRail.tsx
+import { SeasonNote } from '@/components/diary/SeasonNote';
 import { StreakPanel } from '@/components/diary/StreakPanel';
 
 interface WritingRailProps {
@@ -13,6 +14,9 @@ export function WritingRail(props: WritingRailProps) {
   return (
     <div className="space-y-6">
       <StreakPanel {...props} />
+      <div className="border-t pt-6">
+        <SeasonNote date={props.focusDate} />
+      </div>
     </div>
   );
 }
