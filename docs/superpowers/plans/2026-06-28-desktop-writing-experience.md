@@ -1036,7 +1036,7 @@ gh pr merge --squash --delete-branch
 
 **Interfaces:**
 - Consumes: `listEntryDates`（`lib/db/queries/diary.ts`）、`computeStreak`（`lib/diary/streak.ts`）。
-- Produces: `SaveResult = { ok: true; streak: number; firstToday: boolean } | { ok: false; error: string }`。
+- Produces: `SaveResult = { ok: true; streak: number } | { ok: false; error: string }`。
 
 注: Server Action は DB / session 依存のため vitest 対象外。tsc・build・手動で担保。
 
@@ -1053,7 +1053,7 @@ import { todayInTokyo } from '@/lib/calendar/month-grid';
 
 ```ts
 export type SaveResult =
-  | { ok: true; streak: number; firstToday: boolean }
+  | { ok: true; streak: number }
   | { ok: false; error: string };
 ```
 
@@ -1069,12 +1069,8 @@ export type SaveResult =
     const today = todayInTokyo();
     const dates = await listEntryDates();
     const streak = computeStreak(dates, today);
-    // この保存で今日が初記入になったか（演出の強弱に使う）。
-    const firstToday =
-      parsed.data.entryDate === today &&
-      dates.filter((d) => d === today).length === 1;
 
-    return { ok: true, streak, firstToday };
+    return { ok: true, streak };
 ```
 
 - [ ] **Step 4: 型チェック＋ビルド**
@@ -1097,7 +1093,7 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 - Modify: `components/diary/DiaryEditor.tsx`
 
 **Interfaces:**
-- Consumes: `SaveResult.streak` / `SaveResult.firstToday`（Task 12）。
+- Consumes: `SaveResult.streak`（Task 12）。
 
 - [ ] **Step 1: お祝い state を追加**
 
@@ -1196,6 +1192,6 @@ gh pr merge --squash --delete-branch
 
 **2. Placeholder scan:** すべてのコード/コマンド/テストは実体入り。`node_modules/next/dist/docs/` 確認ステップ（Task9 Step1）は実コマンドの前提確認であり placeholder ではない。
 
-**3. Type consistency:** `TodayPrompt`（型・`{ text; source }`）は `lib/ai/daily-prompt.ts` で定義し Action（Task10）が import、`buildPromptInstruction(date, fresh)` のシグネチャは Task9 定義＝Task10 呼び出しで一致。`SaveResult.streak/firstToday`（Task12）を Task13 が消費＝一致。`StreakPanel`/`WritingRail`/`SeasonNote` の props は Task 間で一致。
+**3. Type consistency:** `TodayPrompt`（型・`{ text; source }`）は `lib/ai/daily-prompt.ts` で定義し Action（Task10）が import、`buildPromptInstruction(date, fresh)` のシグネチャは Task9 定義＝Task10 呼び出しで一致。`SaveResult.streak`（Task12）を Task13 が消費＝一致。`StreakPanel`/`WritingRail`/`SeasonNote` の props は Task 間で一致。
 
 **4. テスト方針整合:** vitest 対象は相対 import の leaf 純関数（`season.ts`/`seasonal-prompts.ts`）のみ。`@/` を import するモジュールは tsc/build/手動で担保＝プロジェクト現状と一致。
