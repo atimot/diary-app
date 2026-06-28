@@ -4,11 +4,16 @@
 import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { requireSession } from '@/lib/auth/session';
+import { todayInTokyo } from '@/lib/calendar/month-grid';
 import { db } from '@/lib/db/client';
+import { listEntryDates } from '@/lib/db/queries/diary';
 import { diaryEntries } from '@/lib/db/schema';
+import { computeStreak } from '@/lib/diary/streak';
 import { diaryEntrySchema } from '@/lib/validation/diary';
 
-export type SaveResult = { ok: true } | { ok: false; error: string };
+export type SaveResult =
+  | { ok: true; streak: number }
+  | { ok: false; error: string };
 
 export async function saveDiaryEntry(formData: FormData): Promise<SaveResult> {
   const session = await requireSession();
@@ -46,7 +51,11 @@ export async function saveDiaryEntry(formData: FormData): Promise<SaveResult> {
     revalidatePath('/history');
     revalidatePath(`/diary/${parsed.data.entryDate}`);
 
-    return { ok: true };
+    const today = todayInTokyo();
+    const dates = await listEntryDates();
+    const streak = computeStreak(dates, today);
+
+    return { ok: true, streak };
   } catch (err) {
     console.error('Failed to save diary entry:', err);
     return { ok: false, error: '保存に失敗しました' };
