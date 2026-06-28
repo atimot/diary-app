@@ -5,8 +5,8 @@ import { DiaryDateHeader } from '@/components/diary/DiaryDateHeader';
 import { DiaryEditor } from '@/components/diary/DiaryEditor';
 import { WritingRail } from '@/components/diary/WritingRail';
 import { todayInTokyo } from '@/lib/calendar/month-grid';
-import { computeStreak } from '@/lib/diary/streak';
 import { getDiaryEntry, listEntryDates } from '@/lib/db/queries/diary';
+import { computeStreak } from '@/lib/diary/streak';
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 

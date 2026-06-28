@@ -3,8 +3,18 @@ import { Flame } from 'lucide-react';
 import { buildMonthGrid } from '@/lib/calendar/month-grid';
 
 const WAFU_MONTH = [
-  '睦月', '如月', '弥生', '卯月', '皐月', '水無月',
-  '文月', '葉月', '長月', '神無月', '霜月', '師走',
+  '睦月',
+  '如月',
+  '弥生',
+  '卯月',
+  '皐月',
+  '水無月',
+  '文月',
+  '葉月',
+  '長月',
+  '神無月',
+  '霜月',
+  '師走',
 ];
 
 interface StreakPanelProps {
@@ -65,7 +75,10 @@ export function StreakPanel({
             cls = 'border border-muted-foreground/40';
           }
           return (
-            <span key={cell.iso} className={`aspect-square rounded-full ${cls}`} />
+            <span
+              key={cell.iso}
+              className={`aspect-square rounded-full ${cls}`}
+            />
           );
         })}
       </div>
