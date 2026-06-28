@@ -31,7 +31,7 @@ export default async function HistoryPage({ searchParams }: PageProps) {
   const streak = computeStreak(dates, today);
 
   return (
-    <main className="container mx-auto max-w-3xl p-6">
+    <main className="container mx-auto max-w-5xl p-6">
       <h1 className="mb-4 text-2xl font-bold">日記の履歴</h1>
       {streak > 0 && (
         <div className="mb-6">
