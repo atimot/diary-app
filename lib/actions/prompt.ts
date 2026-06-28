@@ -2,7 +2,10 @@
 
 import { generateText } from 'ai';
 import { defaultModel } from '@/lib/ai/client';
-import { buildPromptInstruction, type TodayPrompt } from '@/lib/ai/daily-prompt';
+import {
+  buildPromptInstruction,
+  type TodayPrompt,
+} from '@/lib/ai/daily-prompt';
 import { requireSession } from '@/lib/auth/session';
 import { pickSeasonalPrompt } from '@/lib/diary/seasonal-prompts';
 
