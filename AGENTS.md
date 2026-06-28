@@ -10,7 +10,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 0. **競合したらトークンが勝つ**（この憲法が既定挙動より優先）。
 1. 色は必ずトークン（`bg-primary` `text-foreground` `text-season` / `var(--…)`）。**生hex・`rgb()/hsl()/oklch()` の色リテラル・任意色クラス・インラインstyleの色リテラル禁止**（例外: `app/globals.css` と `app/dev/**`）。`npm run lint:design` で機械的に弾く。
-2. 見出しは `font-heading`（明朝 Shippori Mincho B1）、本文・UIは既定（Zen Kaku Gothic New）。font-size・余白・角丸は spec §① のスケールから。**11px未満禁止**。
+2. 見出しは `font-heading`（明朝 Noto Serif JP・唯一の self-host Webフォント）、本文・UIは既定（端末標準ゴシックのシステムフォントスタック）。font-size・余白・角丸は spec §① のスケールから。**11px未満禁止**。
 3. アクセント（若葉 `--primary`）は **1画面に1〜2箇所**。朱（`--season`）は日曜・季節の差し色のみ。削除など危険操作は `--destructive`。
 4. 深度は**影でなく罫＋明度差**（4面: background→card→muted→popover）。新規 drop-shadow 禁止（focus ring 等の機能的影は可）。
 5. 新パターン追加前に `/dev/design` と既存部品を確認し**再利用優先**。**ダーク対応必須**（両モードで成立させる）。
@@ -96,9 +96,14 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 - `app/globals.css` の at-rule 順序: **`@import` 系を全部先に、`@plugin` 系を後ろに**。Biome の `noInvalidPositionAtImportRule` で hatching し、CSS 仕様にも合致する。
 
 ## フォント（next/font + 日本語/CJK）
-- 日本語アプリなのに **日本語用 Web フォントが無い** と、日本語は端末の OS 標準フォント任せになり Mac/iPhone（ヒラギノ）と Android（Noto/Roboto）で見た目が変わる。`Geist` は**ラテン文字専用**なので日本語はカバーしない。日本語は `next/font/google` の **Noto Sans JP** で読み込んで全端末統一する。`app/layout.tsx` 参照。
-- **`@theme inline` の自己参照に注意**：`--font-sans: var(--font-sans)` のような自己参照は何も当たらず、ブラウザ既定フォントへフォールバックする（shadcn 雛形が生成。`5132e10` で混入し `#29` で修正）。必ず next/font の変数を指す（`var(--font-geist-sans)` 等）。`font-family` は **Geist → Noto Sans JP → system** のスタックにして字種ごとにフォールバックさせる。
-- **next/font × CJK の罠**：`subsets` に **`'japanese'` は存在しない**（next/font の subset 一覧は `cyrillic / latin / latin-ext / vietnamese` のみ）。`subsets` は「どの subset を **preload** するか」を指定するだけで、**日本語グリフは CSS 内の全 `@font-face` として self-host される**（`findFontFilesInCss` が subsets に関係なく全ファイルをDLし、`subsets` は preload フラグにしか使われない）。よって日本語用フォントは `subsets: ['latin']` + `preload: false` でよい。CJK は巨大なので **preload しない**（`unicode-range` でブラウザが必要分だけ遅延ロードする）。Noto Sans JP は variable 対応なので `weight` 指定も不要。
+- **現行構成（PR #45/#46 で刷新）**：本文・UI＝**端末標準ゴシックのシステムフォントスタック**（Webフォント不使用・転送ゼロ）、見出し＝**Noto Serif JP のみ self-host**（唯一の Webフォント・明朝・可変）。Geist Mono／Zen Kaku Gothic New／Shippori Mincho B1／Noto Sans JP の self-host は**退役済み**。定義は `app/layout.tsx`（next/font は Noto Serif JP 1本だけ）と `app/globals.css`（`--font-sans` / `--font-heading` / `--font-mono`）。
+- **なぜシステムフォントか**：有名な日本語Webアプリの本文はほぼ全て端末標準スタック（note・はてな・Qiita・Yahoo! JAPAN・Amazon JP）。巨大な CJK Webフォントを本文に self-host しないのが業界標準。明朝（セリフ）は本文全面でなく**見出し等の局所アクセント**として1本だけ Webフォント化するのが現実解（Zenn も明朝だけ Noto Serif JP を self-host。Android にセリフ既定が無く、明朝を端末任せにすると Android でゴシックに化けるため）。デジタル庁デザインシステムが本文に Noto Sans JP を採る理由も装飾でなく「全端末統一＋OFL」。メルカリ Mercari Sans 等のブランド書体はロゴ/見出し専用で本文UIには使わない（個人入手も不可）。
+- **`--font-sans`（本文）は OS ごとに和文書体を名指しする**：`-apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, "Noto Sans JP", sans-serif`。**`system-ui` 一語と裸の `游ゴシック` は避ける**（`system-ui` は Windows で細い `Yu Gothic UI` を呼び長文可読性が落ちる／裸の `Yu Gothic` は Windows でかすれ・太字崩れ。`Yu Gothic Medium` を名指しし Meiryo を後ろに置く）。末尾の `"Noto Sans JP"` は素の名前指定で Android のローカル Noto に当てるだけ（self-host ではない）。
+- **見出し `--font-heading` は明朝で揃える**：`var(--font-noto-serif-jp), "Hiragino Mincho ProN", "Yu Mincho", YuMincho, serif`。フォールバックも明朝に保ち未ロード時に角ゴ化させない。`@layer base` で `h1,h2,h3` に `font-weight: 500` を与え墨の存在感＋dark の痩せ対策（`font-bold`/`font-semibold` を当てた見出しはユーティリティ層が優先される）。`.prose :is(h1,h2,h3)` も `--font-heading`。
+- **本文の太字はシステムのネイティブ太字**：システムゴシックは全ウェイトを持つので Markdown の `**強調**`（`font-bold`）が weight をロードせず効く。`--font-mono` もシステム等幅（`ui-monospace, …`）。**新たに和文 Webフォントを self-host で足さない**こと（本文をWebフォント化すると warm ~270ms の転送ゼロが崩れる）。
+- **読み物本文の寸法は一元化済み（PR #46）**：読書面は 16px / `line-height: 1.9`（`.prose p`）/ **和文への正トラッキングなし**。編集（Tiptap）もプレビュー（`.prose`）も 16px に揃え、`EnneagramHero` rationale も本文寸法。和文に latin 的な正の `letter-spacing` を盛らない（間延びするため。`/dev/design` のサンプルも合わせ済み）。
+- **`@theme inline` の自己参照に注意**：`--font-sans: var(--font-sans)` のような自己参照は何も当たらずブラウザ既定へフォールバックする（shadcn 雛形由来。`5132e10` で混入し `#29` で修正）。現行は `--font-sans` がシステムスタックの**リテラル**、`--font-heading` が **next/font の変数**（`var(--font-noto-serif-jp)`）を指す形。
+- **next/font × CJK の罠**：`subsets` に **`'japanese'` は存在しない**（subset 一覧は `cyrillic / latin / latin-ext / vietnamese` のみ）。`subsets` は「どの subset を **preload** するか」のフラグに過ぎず、**日本語グリフは subsets と無関係に全 `@font-face` が self-host され `unicode-range` で遅延ロード**される。よって Noto Serif JP は `subsets: ['latin']` + `preload: false` でよい（可変対応なので `weight` 指定も不要）。CJK は巨大なので **preload しない**。
 
 ## Biome のスタイルポリシー
 - `biome.json` で `quoteStyle: 'single'`、`jsxQuoteStyle: 'double'`。
