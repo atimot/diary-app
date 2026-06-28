@@ -67,13 +67,17 @@ export function DiaryEditor({
     message: string;
   } | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [celebration, setCelebration] = useState<number | null>(null);
 
   const handleAction = (formData: FormData) => {
     startSaveTransition(async () => {
       const result = await saveDiaryEntry(formData);
       if (result.ok) {
         setFeedback({ kind: 'success', message: '保存しました' });
+        setCelebration(result.streak);
         setActiveTab('preview');
+        // 数秒で自然に収める
+        setTimeout(() => setCelebration(null), 3200);
       } else {
         setFeedback({ kind: 'error', message: result.error });
       }
@@ -194,6 +198,27 @@ export function DiaryEditor({
           </span>
         )}
       </div>
+
+      {celebration !== null && celebration > 0 && (
+        <div
+          className="inline-flex animate-in fade-in items-center gap-2 rounded-xl bg-muted px-3 py-2 text-sm text-foreground motion-reduce:animate-none"
+          role="status"
+        >
+          <span
+            className="grid size-6 place-items-center rounded-full bg-foreground font-heading text-xs text-background"
+            aria-hidden="true"
+          >
+            記
+          </span>
+          <span>
+            今日で
+            <span className="mx-1 font-heading tabular-nums text-primary">
+              {celebration}
+            </span>
+            日目。よく続いています。
+          </span>
+        </div>
+      )}
     </form>
   );
 }
