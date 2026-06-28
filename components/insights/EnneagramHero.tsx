@@ -57,7 +57,7 @@ export function EnneagramHero({
           <dd>{dominant.coreFear}</dd>
         </div>
       </dl>
-      <p className="whitespace-pre-wrap text-sm leading-relaxed">{rationale}</p>
+      <p className="whitespace-pre-wrap leading-loose">{rationale}</p>
     </div>
   );
 }
