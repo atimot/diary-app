@@ -46,7 +46,7 @@ export function HeaderNav() {
   };
 
   return (
-    <nav className="container mx-auto flex max-w-3xl items-center justify-between gap-6 p-4">
+    <nav className="container mx-auto flex max-w-5xl items-center justify-between gap-6 px-6 py-4">
       <div className="flex items-center gap-6">
         {links.map((link) => {
           const active = link.match(pathname);
