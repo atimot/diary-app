@@ -1,3 +1,4 @@
+import { AdviceCard } from '@/components/insights/AdviceCard';
 import { EnneagramTrends } from '@/components/insights/EnneagramTrends';
 import { RegenerateButton } from '@/components/insights/RegenerateButton';
 import { countDiaryEntries } from '@/lib/db/queries/diary';
@@ -77,12 +78,7 @@ export default async function InsightsPage() {
             </p>
           </section>
 
-          <section className="space-y-2">
-            <h2 className="text-lg font-semibold">ワンポイントアドバイス</h2>
-            <p className="whitespace-pre-wrap leading-loose">
-              {insight.advice}
-            </p>
-          </section>
+          <AdviceCard advice={insight.advice} />
         </>
       )}
 
