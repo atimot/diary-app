@@ -26,7 +26,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          'prose prose-neutral dark:prose-invert max-w-none min-h-[15rem] px-3 py-2 text-base outline-none md:text-sm',
+          'prose prose-neutral dark:prose-invert max-w-none min-h-[15rem] px-3 py-2 text-base outline-none',
       },
     },
     onUpdate: ({ editor }) => {

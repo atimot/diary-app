@@ -54,9 +54,8 @@ function TypeScale() {
       <h1>見出し H1 — 今日のハイライト</h1>
       <h2>見出し H2 — あなたの傾向</h2>
       <h3>見出し H3 — 水無月</h3>
-      <p className="text-base leading-loose tracking-[0.03em]">
-        本文（Zen Kaku Gothic
-        New）。朝は少し肌寒かったけれど、昼から気持ちよく晴れた。集中できた日は、夜の珈琲がいつもより美味しく感じる。
+      <p className="text-base leading-loose">
+        本文（端末標準ゴシック）。朝は少し肌寒かったけれど、昼から気持ちよく晴れた。集中できた日は、夜の珈琲がいつもより美味しく感じる。
       </p>
       <p className="text-sm text-muted-foreground">
         補足テキスト text-sm / muted-foreground
