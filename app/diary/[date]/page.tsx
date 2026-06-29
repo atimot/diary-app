@@ -5,8 +5,7 @@ import { DiaryDateHeader } from '@/components/diary/DiaryDateHeader';
 import { DiaryEditor } from '@/components/diary/DiaryEditor';
 import { WritingRail } from '@/components/diary/WritingRail';
 import { todayInTokyo } from '@/lib/calendar/month-grid';
-import { getDiaryEntry, listEntryDates } from '@/lib/db/queries/diary';
-import { computeStreak } from '@/lib/diary/streak';
+import { getDiaryEntry } from '@/lib/db/queries/diary';
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -25,25 +24,12 @@ export default async function DiaryDetailPage({ params }: PageProps) {
     notFound(); // 未来日付は 404
   }
 
-  const [entry, entryDates] = await Promise.all([
-    getDiaryEntry(date),
-    listEntryDates(),
-  ]);
-  const streak = computeStreak(entryDates, today);
+  const entry = await getDiaryEntry(date);
   const initialContent = entry?.content ?? '';
   const defaultTab = entry ? 'preview' : 'edit';
 
   return (
-    <DeskLayout
-      rail={
-        <WritingRail
-          streak={streak}
-          entryDates={entryDates}
-          focusDate={date}
-          today={today}
-        />
-      }
-    >
+    <DeskLayout rail={<WritingRail focusDate={date} />}>
       <DiaryDateHeader date={date} />
       <DiaryEditor
         entryDate={date}
