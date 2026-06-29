@@ -35,9 +35,8 @@ export default async function HistoryPage({ searchParams }: PageProps) {
   return (
     <main className="container mx-auto max-w-3xl p-6">
       <h1 className="mb-4 text-2xl font-bold">日記の履歴</h1>
-      {/* カレンダーは aspect-square セルなので枠いっぱいだと巨大化する。
-          快適サイズ（セル ~60px）に max-w-md で収め、左揃えで見出し・ヘッダーと左端を揃える。 */}
-      <div className="max-w-md">
+      {/* カレンダーは本文幅（max-w-3xl）いっぱいに広げ、見出し・ヘッダーと左端を揃える。 */}
+      <div>
         <RecordStats current={current} longest={longest} total={total} />
         <DiaryCalendar
           year={year}
