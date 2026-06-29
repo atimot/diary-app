@@ -33,11 +33,11 @@ export default async function HistoryPage({ searchParams }: PageProps) {
   const total = dates.length;
 
   return (
-    <main className="container mx-auto max-w-5xl p-6">
+    <main className="container mx-auto max-w-3xl p-6">
       <h1 className="mb-4 text-2xl font-bold">日記の履歴</h1>
       {/* カレンダーは aspect-square セルなので枠いっぱいだと巨大化する。
-          快適サイズ（セル ~60px）に収め、積み重ね帯ごと中央寄せ。 */}
-      <div className="mx-auto max-w-md">
+          快適サイズ（セル ~60px）に max-w-md で収め、左揃えで見出し・ヘッダーと左端を揃える。 */}
+      <div className="max-w-md">
         <RecordStats current={current} longest={longest} total={total} />
         <DiaryCalendar
           year={year}

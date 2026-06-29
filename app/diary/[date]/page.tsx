@@ -1,9 +1,7 @@
 // app/diary/[date]/page.tsx
 import { notFound } from 'next/navigation';
-import { DeskLayout } from '@/components/diary/DeskLayout';
 import { DiaryDateHeader } from '@/components/diary/DiaryDateHeader';
 import { DiaryEditor } from '@/components/diary/DiaryEditor';
-import { WritingRail } from '@/components/diary/WritingRail';
 import { todayInTokyo } from '@/lib/calendar/month-grid';
 import { getDiaryEntry } from '@/lib/db/queries/diary';
 
@@ -29,13 +27,13 @@ export default async function DiaryDetailPage({ params }: PageProps) {
   const defaultTab = entry ? 'preview' : 'edit';
 
   return (
-    <DeskLayout rail={<WritingRail focusDate={date} />}>
+    <main className="container mx-auto max-w-3xl p-6">
       <DiaryDateHeader date={date} />
       <DiaryEditor
         entryDate={date}
         initialContent={initialContent}
         defaultTab={defaultTab}
       />
-    </DeskLayout>
+    </main>
   );
 }
