@@ -62,7 +62,7 @@
 
 `#48` 以降に `max-w-5xl` へ広げた箇所を `max-w-3xl` に戻し、ヘッダーと全本文の左端を揃える。
 
-- `components/layout/HeaderNav.tsx`：`<nav>` の `container mx-auto max-w-5xl px-6 py-4` → `container mx-auto max-w-3xl px-6 py-4`（横 padding `px-6` は本文 `p-6` と揃え左端一致。`py-4` 維持）。※ pre-#48 のヘッダーは `p-4`（横16px）だが**そこには戻さない**。#55 で入れた `px-6` を温存し本文 `p-6`（横24px）と左端を一致させる（`p-4` に戻すと 8px ズレが復活する）＝完全巻き戻しではなく #55 の改善は保つ。
+- `components/layout/HeaderNav.tsx`：`<nav>` の `max-w-5xl` → `max-w-3xl`。**実コードの className は `container mx-auto flex max-w-5xl items-center justify-between gap-6 px-6 py-4`。`max-w-5xl` トークンのみを `max-w-3xl` に置換し、`flex items-center justify-between gap-6`・`px-6`・`py-4` 等の他クラスは保持する**（nav の両端揃え＝左ナビ／右アカウント・テーマを壊さない）。※ 横 padding `px-6` は本文 `p-6` と揃え左端一致のため維持。pre-#48 のヘッダーは `p-4`（横16px）だが**そこには戻さない**（#55 で入れた `px-6` を温存。`p-4` に戻すと本文と 8px ズレが復活する）＝完全巻き戻しではなく #55 の改善は保つ。
 - `app/history/page.tsx`：`<main>` の `max-w-5xl` → `max-w-3xl`（③で内部も直す）。
 - `app/insights/page.tsx`：`max-w-5xl` の**全3箇所（32 / 45 / 58 行）**を `max-w-3xl` に。**`max-w-5xl` というトークンのみを置換**し、同一 className 内の他クラス（58行の `space-y-10` 等）は保持する。中身は不変。
 - 念のため、リポジトリ全体で `max-w-5xl` をプラン段階で grep し、上記以外に残っていないことを確認（`app/dev/**` は対象外でよい）。`components/diary/DeskLayout.tsx:16` にも `max-w-5xl` があるが、これは**ファイルごと削除**されるため別途対応不要。
@@ -96,7 +96,7 @@
 ## 受け入れ条件（ユーザー視点）
 
 1. 書く画面（`/`・`/diary/[date]`）から右レール（季節のたより・履歴リンク）が消え、改修前のシンプルな単カラムに戻る。
-2. 全ページ（ヘッダー・書く画面・履歴・分析）の横幅が `max-w-3xl` に揃い、左端が一致する。
+2. 全ページ（ヘッダー・書く画面・履歴・分析）の横幅が `max-w-3xl` に揃い、左端が一致する（ヘッダーの横 padding は `px-6` を維持＝`p-4` には戻さない。本文 `p-6` と左端を一致させるため。完全な pre-#48 復元ではなく #55 の幅揃え改善は温存する）。
 3. `/history` の見出し・指標・カレンダーの左端が揃い、「幅があってない」状態が解消される（カレンダーは見やすいサイズのまま）。
 4. 今日の問い・保存演出・`/history` のカレンダー機能は従来どおり動く。
 5. light/dark どちらでも崩れない。
