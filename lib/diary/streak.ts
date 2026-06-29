@@ -37,3 +37,25 @@ export function computeStreak(
   }
   return count;
 }
+
+// 全履歴のうち、連続した日付（カレンダー上で隣り合う日）の最長ランの長さを返す。
+// 現在連続と違い「今日」に依存しない。未ソート・重複入力でも正しく動く。
+export function computeLongestStreak(entryDates: readonly string[]): number {
+  if (entryDates.length === 0) return 0;
+
+  // 重複除去 → 昇順ソート（'YYYY-MM-DD' の辞書順 = 日付順）
+  const sorted = [...new Set(entryDates)].sort();
+
+  let longest = 1;
+  let run = 1;
+  for (let i = 1; i < sorted.length; i += 1) {
+    // 当日の前日 (= 当日 -1) が直前要素なら連続
+    if (subDays(sorted[i], 1) === sorted[i - 1]) {
+      run += 1;
+    } else {
+      run = 1;
+    }
+    if (run > longest) longest = run;
+  }
+  return longest;
+}

@@ -1,14 +1,14 @@
 // app/history/page.tsx
 
 import { DiaryCalendar } from '@/components/diary/DiaryCalendar';
-import { StreakBadge } from '@/components/diary/StreakBadge';
+import { RecordStats } from '@/components/diary/RecordStats';
 import {
   formatYearMonth,
   parseYearMonth,
   todayInTokyo,
 } from '@/lib/calendar/month-grid';
 import { listEntryDates } from '@/lib/db/queries/diary';
-import { computeStreak } from '@/lib/diary/streak';
+import { computeLongestStreak, computeStreak } from '@/lib/diary/streak';
 
 interface PageProps {
   searchParams: Promise<{ ym?: string }>;
@@ -28,16 +28,14 @@ export default async function HistoryPage({ searchParams }: PageProps) {
 
   const dates = await listEntryDates();
   const writtenDates = new Set(dates);
-  const streak = computeStreak(dates, today);
+  const current = computeStreak(dates, today);
+  const longest = computeLongestStreak(dates);
+  const total = dates.length;
 
   return (
     <main className="container mx-auto max-w-5xl p-6">
       <h1 className="mb-4 text-2xl font-bold">日記の履歴</h1>
-      {streak > 0 && (
-        <div className="mb-6">
-          <StreakBadge streak={streak} />
-        </div>
-      )}
+      <RecordStats current={current} longest={longest} total={total} />
       <DiaryCalendar
         year={year}
         month={month}
