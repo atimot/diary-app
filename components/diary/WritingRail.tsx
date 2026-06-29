@@ -1,21 +1,23 @@
 // components/diary/WritingRail.tsx
+import Link from 'next/link';
 import { SeasonNote } from '@/components/diary/SeasonNote';
-import { StreakPanel } from '@/components/diary/StreakPanel';
 
 interface WritingRailProps {
-  streak: number;
-  entryDates: readonly string[];
-  focusDate: string;
-  today: string;
+  focusDate: string; // YYYY-MM-DD（書いている日）
 }
 
-// 右レール（文机の道具一式）。控えめな伴走情報を縦に積む。
-export function WritingRail(props: WritingRailProps) {
+// 右レール（文机の道具一式）。季節のたよりと、履歴への控えめな導線を縦に積む。
+export function WritingRail({ focusDate }: WritingRailProps) {
   return (
     <div className="space-y-6">
-      <StreakPanel {...props} />
+      <SeasonNote date={focusDate} />
       <div className="border-t pt-6">
-        <SeasonNote date={props.focusDate} />
+        <Link
+          href="/history"
+          className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          これまでの記録 →
+        </Link>
       </div>
     </div>
   );

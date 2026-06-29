@@ -6,30 +6,18 @@ import { TodayPrompt } from '@/components/diary/TodayPrompt';
 import { WritingRail } from '@/components/diary/WritingRail';
 import { getTodayPrompt } from '@/lib/ai/daily-prompt';
 import { todayInTokyo } from '@/lib/calendar/month-grid';
-import { getDiaryEntry, listEntryDates } from '@/lib/db/queries/diary';
-import { computeStreak } from '@/lib/diary/streak';
+import { getDiaryEntry } from '@/lib/db/queries/diary';
 
 export default async function HomePage() {
   const date = todayInTokyo();
-  const [existing, entryDates, prompt] = await Promise.all([
+  const [existing, prompt] = await Promise.all([
     getDiaryEntry(date),
-    listEntryDates(),
     getTodayPrompt(date),
   ]);
-  const streak = computeStreak(entryDates, date);
   const defaultTab = existing ? 'preview' : 'edit';
 
   return (
-    <DeskLayout
-      rail={
-        <WritingRail
-          streak={streak}
-          entryDates={entryDates}
-          focusDate={date}
-          today={date}
-        />
-      }
-    >
+    <DeskLayout rail={<WritingRail focusDate={date} />}>
       <DiaryDateHeader date={date} />
       <TodayPrompt initialText={prompt.text} date={date} />
       <DiaryEditor
