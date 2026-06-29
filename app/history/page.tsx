@@ -35,19 +35,23 @@ export default async function HistoryPage({ searchParams }: PageProps) {
   return (
     <main className="container mx-auto max-w-5xl p-6">
       <h1 className="mb-4 text-2xl font-bold">日記の履歴</h1>
-      <RecordStats current={current} longest={longest} total={total} />
-      <DiaryCalendar
-        year={year}
-        month={month}
-        today={today}
-        writtenDates={writtenDates}
-        currentYearMonth={formatYearMonth(currentYear, currentMonth)}
-      />
-      {dates.length === 0 && (
-        <p className="mt-6 text-sm text-muted-foreground">
-          まだ日記がありません。トップから書いてみましょう。
-        </p>
-      )}
+      {/* カレンダーは aspect-square セルなので枠いっぱいだと巨大化する。
+          快適サイズ（セル ~60px）に収め、積み重ね帯ごと中央寄せ。 */}
+      <div className="mx-auto max-w-md">
+        <RecordStats current={current} longest={longest} total={total} />
+        <DiaryCalendar
+          year={year}
+          month={month}
+          today={today}
+          writtenDates={writtenDates}
+          currentYearMonth={formatYearMonth(currentYear, currentMonth)}
+        />
+        {dates.length === 0 && (
+          <p className="mt-6 text-sm text-muted-foreground">
+            まだ日記がありません。トップから書いてみましょう。
+          </p>
+        )}
+      </div>
     </main>
   );
 }
