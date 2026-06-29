@@ -32,7 +32,9 @@
 
 - `git revert` はしない。`#48` は今も使う機能（今日の問い `TodayPrompt`／保存演出）と絡むため、**前向きな手編集で実質巻き戻す**。
 - 本文の構成（日付ヘッダー → 今日の問い → エディタ）・データ取得・保存演出・`/history` の `RecordStats`/`DiaryCalendar` の中身・`/insights` の中身は**変えない**（横幅クラスだけ戻す）。
-- `lib/diary/season.ts`：`SeasonNote` 削除後に未参照になったら**併せて削除**（dead code 化を残さない）。まだ他から参照されていれば残す（grep で判定）。
+- **`lib/diary/season.ts` と `lib/diary/season.test.ts` は削除しない**。`getSeason` を `lib/ai/daily-prompt.ts`（今日の問い）が使い続けるため、`SeasonNote` 撤去後も dead code にならない（grep 確認済み）。**削除するのは `SeasonNote.tsx` コンポーネントのみ**。
+- **#58 でレールに置いた「これまでの記録 →」リンクも `WritingRail` ごと撤去される。** `/history` への導線は `HeaderNav` の「履歴」タブ（全ページ共通・PC/モバイル両対応）に一本化され到達性は維持される（#58 spec の受け入れ条件4は本変更で無効化される）。
+- **季節情緒（節気の朱）** は書く画面のレールからは消えるが、今日の問い（`getSeason` 由来）と `/history` カレンダーの日曜セルには残るため、画面から完全には消えない（意図的に許容）。
 
 ## アクセント予算（憲法 §3）
 
@@ -54,16 +56,16 @@
 
 - `components/diary/DeskLayout.tsx`（2カラム土台。`/`・`/diary/[date]` 以外から参照されていないことを grep 確認）
 - `components/diary/WritingRail.tsx`（右レール本体）
-- `components/diary/SeasonNote.tsx`（季節のたより。完全削除）
+- `components/diary/SeasonNote.tsx`（季節のたより。**コンポーネントのみ削除**。ロジック `lib/diary/season.ts` は今日の問いが使うため残す）
 
 ## ② 全ページの横幅を `max-w-3xl` に統一
 
 `#48` 以降に `max-w-5xl` へ広げた箇所を `max-w-3xl` に戻し、ヘッダーと全本文の左端を揃える。
 
-- `components/layout/HeaderNav.tsx`：`<nav>` の `container mx-auto max-w-5xl px-6 py-4` → `container mx-auto max-w-3xl px-6 py-4`（横 padding `px-6` は本文 `p-6` と揃え左端一致。`py-4` 維持）。
+- `components/layout/HeaderNav.tsx`：`<nav>` の `container mx-auto max-w-5xl px-6 py-4` → `container mx-auto max-w-3xl px-6 py-4`（横 padding `px-6` は本文 `p-6` と揃え左端一致。`py-4` 維持）。※ pre-#48 のヘッダーは `p-4`（横16px）だが**そこには戻さない**。#55 で入れた `px-6` を温存し本文 `p-6`（横24px）と左端を一致させる（`p-4` に戻すと 8px ズレが復活する）＝完全巻き戻しではなく #55 の改善は保つ。
 - `app/history/page.tsx`：`<main>` の `max-w-5xl` → `max-w-3xl`（③で内部も直す）。
-- `app/insights/page.tsx`：`container mx-auto max-w-5xl p-6` の**全出現**（空状態・通常など複数）を `max-w-3xl` に。中身は不変。
-- 念のため、リポジトリ全体で `max-w-5xl` をプラン段階で grep し、上記以外に残っていないことを確認（`app/dev/**` は対象外でよい）。
+- `app/insights/page.tsx`：`max-w-5xl` の**全3箇所（32 / 45 / 58 行）**を `max-w-3xl` に。**`max-w-5xl` というトークンのみを置換**し、同一 className 内の他クラス（58行の `space-y-10` 等）は保持する。中身は不変。
+- 念のため、リポジトリ全体で `max-w-5xl` をプラン段階で grep し、上記以外に残っていないことを確認（`app/dev/**` は対象外でよい）。`components/diary/DeskLayout.tsx:16` にも `max-w-5xl` があるが、これは**ファイルごと削除**されるため別途対応不要。
 
 ## ③ `/history` の左端ズレを解消（左揃え）
 
@@ -80,7 +82,7 @@
 
 - grep：リポジトリ全体（`app/dev/**` 除く）で `DeskLayout`・`WritingRail`・`SeasonNote` への参照が**ゼロ**。関連 import の取り残しなし。
 - grep：`max-w-5xl` が `app/**`・`components/**`（`app/dev/**` 除く）に**残っていない**（全ページ `max-w-3xl` 化）。
-- `lib/diary/season.ts`：`SeasonNote` 削除後に参照ゼロなら削除（テストがあれば併せて）。参照が残るなら据え置き。grep で判定し報告。
+- **`lib/diary/season.ts` / `lib/diary/season.test.ts` は残す**（`getSeason` を `lib/ai/daily-prompt.ts` が使用）。grep で「`SeasonNote` 撤去後も `getSeason` 参照が `daily-prompt.ts` に残る＝`season.ts` は削除しない」を確認。
 - 既存テストは green（`vitest run`）。削除対象コンポーネント（`DeskLayout`/`WritingRail`/`SeasonNote`）の component テストは存在しない見込み（プランで grep 確認）。
 - `npm run lint`（biome）/ `npm run lint:design` / `npx tsc --noEmit` / `npm run test` / `npm run build` がすべて pass。
 - CI（lint / lint:design / tsc / test / build）green → squash merge（`AGENTS.md` の PR フロー、main 直 push 不可）。
@@ -88,6 +90,7 @@
   - `/` と `/diary/[date]` が**単カラム**（右レールなし）で、本文は日付→今日の問い→エディタ。
   - ヘッダー・`/`・`/history`・`/insights` の本文左端が**揃っている**（`max-w-3xl`）。
   - `/history` の見出し・指標・カレンダーの左端が揃い、カレンダーが快適サイズ。
+  - `/history` 左揃えの結果、カレンダー(448px)の右に約320pxの空きが出て指標の下罫も見出しより短く出る（中央寄せコンテナ＋中身左揃えの作法どおり・意図的）。不自然に間延びして見えないかを light/dark で確認。
   - light/dark 両モードで成立。
 
 ## 受け入れ条件（ユーザー視点）
