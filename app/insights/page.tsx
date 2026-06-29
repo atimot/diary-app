@@ -29,7 +29,7 @@ export default async function InsightsPage() {
   if (entryCount < MIN_ENTRIES) {
     const remaining = MIN_ENTRIES - entryCount;
     return (
-      <main className="container mx-auto max-w-5xl p-6">
+      <main className="container mx-auto max-w-3xl p-6">
         <h1 className="mb-6 text-2xl font-bold">あなたの傾向</h1>
         <p className="text-muted-foreground">
           AI 分析を見るには日記が {MIN_ENTRIES} 件必要です。あと {remaining}{' '}
@@ -42,7 +42,7 @@ export default async function InsightsPage() {
   // state 2: 件数は足りているが、insight も enneagram もまだ生成していない
   if (!insight && !enneagram) {
     return (
-      <main className="container mx-auto max-w-5xl p-6">
+      <main className="container mx-auto max-w-3xl p-6">
         <h1 className="mb-6 text-2xl font-bold">あなたの傾向</h1>
         <p className="mb-4 text-muted-foreground">
           日記が {entryCount} 件溜まりました。AI
@@ -55,7 +55,7 @@ export default async function InsightsPage() {
 
   // state 3: 少なくとも片方のキャッシュあり
   return (
-    <main className="container mx-auto max-w-5xl space-y-10 p-6">
+    <main className="container mx-auto max-w-3xl space-y-10 p-6">
       <header>
         <h1 className="text-2xl font-bold">あなたの傾向</h1>
         {insight && (
