@@ -23,17 +23,11 @@ export default async function DiaryDetailPage({ params }: PageProps) {
   }
 
   const entry = await getDiaryEntry(date);
-  const initialContent = entry?.content ?? '';
-  const defaultTab = entry ? 'preview' : 'edit';
 
   return (
-    <main className="container mx-auto max-w-3xl p-6">
+    <main className="mx-auto w-full max-w-[680px] flex-1 px-6 pt-11 pb-20">
       <DiaryDateHeader date={date} />
-      <DiaryEditor
-        entryDate={date}
-        initialContent={initialContent}
-        defaultTab={defaultTab}
-      />
+      <DiaryEditor entryDate={date} initialContent={entry?.content ?? ''} />
     </main>
   );
 }

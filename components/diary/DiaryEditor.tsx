@@ -4,6 +4,7 @@
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
+import { SunDot } from '@/components/icons/SunDot';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,50 +17,37 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { deleteDiaryEntry, saveDiaryEntry } from '@/lib/actions/diary';
+import { charCountFromMarkdown } from '@/lib/diary/excerpt';
 
-// 重量級の編集UIは初期バンドルから外す（クライアントJS削減）。どちらも
-// `{activeTab === … && …}` でタブ選択時のみ描画＝そのタブを開くまで chunk を読まない。
-//
-// RichTextEditor=Tiptap/ProseMirror(+marked) は browser API 依存（immediatelyRender:false）
-// のため **ssr:false 必須**。編集タブを開くまでロードしない。
+// Tiptap/ProseMirror(+marked) は browser API 依存（immediatelyRender:false）のため
+// **ssr:false 必須**。ひとひ刷新でタブを廃し WYSIWYG 一本になったので、
+// エディタは常時マウント（chunk は初期表示で読む。書く画面が主役のため許容）。
 const RichTextEditor = dynamic(
   () =>
     import('@/components/diary/RichTextEditor').then((m) => m.RichTextEditor),
   {
     ssr: false,
     loading: () => (
-      <div className="min-h-[15rem] animate-pulse rounded-xl border" />
+      <div className="min-h-[22rem] animate-pulse rounded-xl border bg-card shadow-card" />
     ),
-  },
-);
-
-// DiaryMarkdown=react-markdown は SSR 安全なので **ssr は既定(true)のまま**にする。
-// プレビュー本文は閲覧の主動線なので SSR して初期HTMLに乗せる（ssr:false にすると
-// 本文がクライアント描画のみになり、スケルトンのちらつき／背景タブで空表示になる）。
-// それでも編集タブ既定（新規エントリ）ではプレビューが描画されず chunk は読まれない。
-const DiaryMarkdown = dynamic(
-  () => import('@/components/diary/DiaryMarkdown').then((m) => m.DiaryMarkdown),
-  {
-    loading: () => <div className="min-h-[15rem] animate-pulse" />,
   },
 );
 
 interface DiaryEditorProps {
   entryDate: string;
   initialContent?: string;
-  defaultTab?: 'edit' | 'preview';
 }
 
 export function DiaryEditor({
   entryDate,
   initialContent = '',
-  defaultTab = 'edit',
 }: DiaryEditorProps) {
   const router = useRouter();
   const [content, setContent] = useState(initialContent);
-  const [activeTab, setActiveTab] = useState<'edit' | 'preview'>(defaultTab);
+  const [charCount, setCharCount] = useState(() =>
+    charCountFromMarkdown(initialContent),
+  );
   const [isSavePending, startSaveTransition] = useTransition();
   const [isDeletePending, startDeleteTransition] = useTransition();
   const [feedback, setFeedback] = useState<{
@@ -75,7 +63,6 @@ export function DiaryEditor({
       if (result.ok) {
         setFeedback({ kind: 'success', message: '保存しました' });
         setCelebration(result.streak);
-        setActiveTab('preview');
         // 数秒で自然に収める
         setTimeout(() => setCelebration(null), 3200);
       } else {
@@ -96,55 +83,69 @@ export function DiaryEditor({
     });
   };
 
+  const handleChange = (markdown: string, textLength: number) => {
+    setContent(markdown);
+    setCharCount(textLength);
+  };
+
   const canDelete = initialContent.trim().length > 0;
   const isPending = isSavePending || isDeletePending;
 
   return (
-    <form action={handleAction} className="space-y-4">
-      {/* form データは hidden input から確実に渡す。タブ切替で textarea が unmount される可能性に備える */}
+    <form action={handleAction} className="mt-5">
+      {/* form データは hidden input から確実に渡す（エディタは非制御の WYSIWYG） */}
       <input type="hidden" name="entryDate" value={entryDate} />
       <input type="hidden" name="content" value={content} />
 
-      <Tabs
-        value={activeTab}
-        onValueChange={(value) => setActiveTab(value as 'edit' | 'preview')}
-        className="w-full"
-      >
-        <TabsList variant="line">
-          <TabsTrigger value="edit" className="after:bg-primary">
-            編集
-          </TabsTrigger>
-          <TabsTrigger value="preview" className="after:bg-primary">
-            プレビュー
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="edit">
-          {/* 編集タブを開いたときだけ Tiptap をマウント＝チャンクを初DL */}
-          {activeTab === 'edit' && (
-            <RichTextEditor
-              key={entryDate}
-              value={content}
-              onChange={setContent}
-              placeholder="今日はどんな1日でしたか？"
-            />
-          )}
-        </TabsContent>
-
-        <TabsContent value="preview">
-          <div className="min-h-[15rem] rounded-xl border bg-card p-5">
-            {activeTab === 'preview' && <DiaryMarkdown content={content} />}
+      <RichTextEditor
+        key={entryDate}
+        value={content}
+        onChange={handleChange}
+        placeholder="今日はどんな1日でしたか？"
+        footerEnd={
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground tabular-nums">
+              {charCount}字
+            </span>
+            <span className="hidden rounded-md border px-1.5 py-0.5 text-[11px] text-muted-foreground sm:inline">
+              ⌘⏎で保存
+            </span>
+            <Button
+              type="submit"
+              className="px-5 font-semibold"
+              disabled={isPending || content.trim().length === 0}
+            >
+              {isSavePending ? '保存中…' : '保存する'}
+            </Button>
           </div>
-        </TabsContent>
-      </Tabs>
+        }
+      />
 
-      <div className="flex items-center gap-3">
-        <Button
-          type="submit"
-          disabled={isPending || content.trim().length === 0}
-        >
-          {isSavePending ? '保存中…' : '保存'}
-        </Button>
+      <div className="mt-3 flex min-h-6 flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-3">
+          {feedback && (
+            <span
+              className={
+                feedback.kind === 'success'
+                  ? 'text-sm text-muted-foreground'
+                  : 'text-sm text-destructive'
+              }
+            >
+              {feedback.message}
+            </span>
+          )}
+          {celebration !== null && celebration > 0 && (
+            <span
+              className="inline-flex animate-in fade-in items-center gap-1.5 rounded-full bg-streak-soft px-3 py-1 motion-reduce:animate-none"
+              role="status"
+            >
+              <SunDot className="size-3 text-streak" />
+              <span className="text-[11.5px] font-semibold text-streak">
+                今日で{celebration}日つづき。よく続いています。
+              </span>
+            </span>
+          )}
+        </div>
         {canDelete && (
           <AlertDialog
             open={confirmOpen}
@@ -157,10 +158,12 @@ export function DiaryEditor({
               render={
                 <Button
                   type="button"
-                  variant="destructive"
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-destructive"
                   disabled={isPending}
                 >
-                  削除
+                  この日の日記を削除
                 </Button>
               }
             />
@@ -186,39 +189,7 @@ export function DiaryEditor({
             </AlertDialogContent>
           </AlertDialog>
         )}
-        {feedback && (
-          <span
-            className={
-              feedback.kind === 'success'
-                ? 'text-sm text-muted-foreground'
-                : 'text-sm text-destructive'
-            }
-          >
-            {feedback.message}
-          </span>
-        )}
       </div>
-
-      {celebration !== null && celebration > 0 && (
-        <div
-          className="inline-flex animate-in fade-in items-center gap-2 rounded-xl bg-muted px-3 py-2 text-sm text-foreground motion-reduce:animate-none"
-          role="status"
-        >
-          <span
-            className="grid size-6 place-items-center rounded-full bg-foreground font-heading text-xs text-background"
-            aria-hidden="true"
-          >
-            記
-          </span>
-          <span>
-            今日で
-            <span className="mx-1 font-heading tabular-nums text-primary">
-              {celebration}
-            </span>
-            日目。よく続いています。
-          </span>
-        </div>
-      )}
     </form>
   );
 }

@@ -1,23 +1,15 @@
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
-import { Noto_Serif_JP } from 'next/font/google';
 import { HeaderNav } from '@/components/layout/HeaderNav';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import './globals.css';
 
-// 唯一の self-host Webフォント。見出し（明朝）にだけ使う。
-// 本文・UI は端末標準ゴシック（システムフォント）に委ねて転送ゼロにする。
-// 可変フォントなので weight 不要。CJK は巨大なので preload しない（unicode-range で遅延ロード）。
-const notoSerifJP = Noto_Serif_JP({
-  variable: '--font-noto-serif-jp',
-  subsets: ['latin'],
-  preload: false,
-  display: 'swap',
-});
+// ひとひ刷新（2026-07）で Noto Serif JP（明朝見出し）を退役し、Webフォント0本に。
+// 本文・見出しとも端末標準ゴシック（globals.css の --font-sans / --font-heading）。
 
 export const metadata: Metadata = {
-  title: '日記アプリ',
-  description: '1日1つの日記を記録するアプリ',
+  title: 'ひとひ',
+  description: '1日の終わりに、3分だけ。ひとことから書ける日記',
 };
 
 export default function RootLayout({
@@ -26,16 +18,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="ja"
-      suppressHydrationWarning
-      className={`${notoSerifJP.variable} h-full antialiased`}
-    >
+    <html lang="ja" suppressHydrationWarning className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <header className="border-b">
-            <HeaderNav />
-          </header>
+          {/* サインインではロゴのみのヘッダをページ側で描くため、
+              <header> ごと HeaderNav が持つ（/sign-in では null を返す）。 */}
+          <HeaderNav />
           {children}
           <SpeedInsights />
         </ThemeProvider>

@@ -39,6 +39,13 @@ export const CENTER_LABELS: Record<EnneagramCenter, string> = {
   head: '思考（頭）',
 };
 
+// チップや凡例で使う短縮ラベル（「感情タイプ」「●感情」など）。
+export const CENTER_SHORT_LABELS: Record<EnneagramCenter, string> = {
+  gut: '本能',
+  heart: '感情',
+  head: '思考',
+};
+
 // 3センターの色。値は globals.css の CSS 変数（ライト/ダーク両対応）。
 // SVG / HTML どちらも style 経由で var() 参照する。
 export const CENTER_COLOR_VARS: Record<EnneagramCenter, string> = {

@@ -1,10 +1,8 @@
 import { notFound } from 'next/navigation';
 import { DiaryDateHeader } from '@/components/diary/DiaryDateHeader';
-import { StreakBadge } from '@/components/diary/StreakBadge';
+import { StreakPill } from '@/components/diary/StreakPill';
 import { BarTrack, MeterFill } from '@/components/insights/MeterBar';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 
 // dev 専用の見本帳。トークン/タイポ/コンポーネントを一覧して目視確認する。
 // 本番ビルドでは notFound() で塞ぐ（app/dev/enneagram と同じ流儀）。
@@ -19,16 +17,25 @@ const SWATCHES: { label: string; className: string; text: string }[] = [
   },
   { label: 'muted', className: 'bg-muted', text: 'text-muted-foreground' },
   {
-    label: 'secondary',
-    className: 'bg-secondary',
-    text: 'text-secondary-foreground',
+    label: 'accent（青7%面）',
+    className: 'bg-accent',
+    text: 'text-accent-foreground',
   },
   {
-    label: 'primary（若葉）',
+    label: 'primary（青）',
     className: 'bg-primary',
     text: 'text-primary-foreground',
   },
-  { label: 'season（朱）', className: 'bg-season', text: 'text-background' },
+  {
+    label: 'streak（アンバー）',
+    className: 'bg-streak',
+    text: 'text-background',
+  },
+  {
+    label: 'season（テラコッタ）',
+    className: 'bg-season',
+    text: 'text-background',
+  },
   { label: 'border', className: 'bg-border', text: 'text-foreground' },
 ];
 
@@ -51,19 +58,21 @@ function Swatches() {
 function TypeScale() {
   return (
     <div className="space-y-3">
-      <h1>見出し H1 — 今日のハイライト</h1>
-      <h2>見出し H2 — あなたの傾向</h2>
-      <h3>見出し H3 — 水無月</h3>
-      <p className="text-base leading-loose">
-        本文（端末標準ゴシック）。朝は少し肌寒かったけれど、昼から気持ちよく晴れた。集中できた日は、夜の珈琲がいつもより美味しく感じる。
+      <h1 className="text-[22px]">見出し（22px / 600 / 字間 .03em）</h1>
+      <h2 className="text-[21px]">ページ見出し（21px）</h2>
+      <p className="text-[15px] leading-[2.05]">
+        日記本文（15px / 行間 2.05 /
+        端末標準ゴシック）。朝から細い雨。傘を持たずに出て、駅までの数分で少し濡れた。
       </p>
       <p className="text-sm text-muted-foreground">
         補足テキスト text-sm / muted-foreground
       </p>
-      <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-        Eyebrow ラベル
+      <p className="text-[12.5px] font-semibold text-primary">
+        カードラベル（12.5px / 600 / primary）
       </p>
-      <p className="font-heading text-3xl tabular-nums">2026 6月26日</p>
+      <p className="text-sm font-semibold tracking-[0.18em]">
+        ひとひ（ワードマーク字間 .18em）
+      </p>
     </div>
   );
 }
@@ -71,14 +80,32 @@ function TypeScale() {
 function Buttons() {
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <Button>保存</Button>
+      <Button className="px-5 font-semibold">保存する</Button>
       <Button variant="outline">アウトライン</Button>
       <Button variant="secondary">セカンダリ</Button>
       <Button variant="ghost">ゴースト</Button>
       <Button variant="destructive">削除</Button>
       <Button variant="link">リンク</Button>
-      <Button size="sm">小</Button>
-      <Button size="lg">大</Button>
+    </div>
+  );
+}
+
+function Chips() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <button
+        type="button"
+        className="rounded-lg border border-primary/25 bg-accent px-3.5 py-2 text-[12.5px] text-primary transition hover:bg-primary/12"
+      >
+        Q. 最近、夢中になれたことは？
+      </button>
+      <button
+        type="button"
+        className="rounded-lg border px-3.5 py-2 text-[12.5px] text-muted-foreground transition hover:border-input hover:text-foreground"
+      >
+        じぶんで書く
+      </button>
+      <StreakPill streak={4} />
     </div>
   );
 }
@@ -93,13 +120,13 @@ function Meters() {
     <div className="space-y-3">
       {rows.map((r) => (
         <div key={r.label}>
-          <div className="mb-1 flex justify-between text-sm">
+          <div className="mb-1 flex justify-between text-xs">
             <span>{r.label}</span>
             <span className="tabular-nums text-muted-foreground">
-              {Math.round(r.value * 100)}%
+              {Math.round(r.value * 100)}
             </span>
           </div>
-          <BarTrack height="h-1.5">
+          <BarTrack height="h-[5px]" className="bg-secondary">
             <MeterFill value={r.value} color="var(--primary)" />
           </BarTrack>
         </div>
@@ -110,22 +137,49 @@ function Meters() {
 
 function CalendarCells() {
   return (
-    <div className="flex flex-wrap gap-2 text-sm">
-      <span className="flex aspect-square w-9 items-center justify-center rounded-md bg-primary font-medium text-primary-foreground">
-        記
+    <div className="flex flex-wrap items-center gap-2 text-xs">
+      <span className="grid size-[30px] place-items-center rounded-full bg-primary font-semibold text-primary-foreground">
+        8
       </span>
-      <span className="flex aspect-square w-9 items-center justify-center rounded-md text-muted-foreground ring-2 ring-primary">
+      <span className="grid size-[30px] place-items-center rounded-full bg-primary font-bold text-primary-foreground ring-2 ring-streak ring-offset-2 ring-offset-background">
         今
       </span>
-      <span className="flex aspect-square w-9 items-center justify-center rounded-md text-muted-foreground">
+      <span className="grid size-[30px] place-items-center rounded-full text-muted-foreground">
         未
       </span>
-      <span className="flex aspect-square w-9 items-center justify-center rounded-md text-muted-foreground/40">
+      <span className="grid size-[30px] place-items-center rounded-full text-muted-foreground/50">
         来
       </span>
-      <span className="flex aspect-square w-9 items-center justify-center rounded-md text-season">
+      <span className="grid size-[30px] place-items-center rounded-full text-streak">
         日
       </span>
+      <span className="text-muted-foreground">
+        （書いた日 / 今日リング / 未記入 / 未来 / 曜日ヘッダ日曜）
+      </span>
+    </div>
+  );
+}
+
+function Cards() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <div className="rounded-xl border bg-card p-6 shadow-card">
+        <h2 className="text-[12.5px] font-semibold tracking-normal text-primary">
+          白カード＋淡い影
+        </h2>
+        <p className="mt-3 text-sm leading-[2.05]">
+          深度は罫＋明度差＋light のみの
+          --shadow-card。ダークでは影が消え、面の明度差だけになる。
+        </p>
+      </div>
+      <div className="rounded-xl border border-primary/20 bg-accent p-6">
+        <h2 className="text-[12.5px] font-semibold tracking-normal text-primary">
+          アクセント面カード
+        </h2>
+        <p className="mt-3 text-sm leading-[2.05] text-foreground/90">
+          「ひとことアドバイス」などの強調面。青の 7% 面＋青の淡い罫。
+        </p>
+      </div>
     </div>
   );
 }
@@ -135,7 +189,7 @@ function Showcase() {
     <div className="space-y-10">
       <section className="space-y-3">
         <h2>日付ヘッダ</h2>
-        <DiaryDateHeader date="2026-06-26" />
+        <DiaryDateHeader date="2026-07-08" />
       </section>
       <section className="space-y-3">
         <h2>カラートークン</h2>
@@ -150,19 +204,12 @@ function Showcase() {
         <Buttons />
       </section>
       <section className="space-y-3">
-        <h2>タブ</h2>
-        <Tabs defaultValue="edit">
-          <TabsList>
-            <TabsTrigger value="edit">編集</TabsTrigger>
-            <TabsTrigger value="preview">プレビュー</TabsTrigger>
-          </TabsList>
-          <TabsContent value="edit">
-            <Textarea placeholder="今日はどんな1日でしたか？" />
-          </TabsContent>
-          <TabsContent value="preview">
-            <div className="rounded-md border p-4 text-sm">プレビュー領域</div>
-          </TabsContent>
-        </Tabs>
+        <h2>チップ / ピル</h2>
+        <Chips />
+      </section>
+      <section className="space-y-3">
+        <h2>カード</h2>
+        <Cards />
       </section>
       <section className="space-y-3">
         <h2>メーター</h2>
@@ -173,10 +220,6 @@ function Showcase() {
         <CalendarCells />
       </section>
       <section className="space-y-3">
-        <h2>連続記入バッジ</h2>
-        <StreakBadge streak={12} />
-      </section>
-      <section className="space-y-3">
         <h2>エニアグラム中心色（データ分類専用）</h2>
         <div className="flex gap-4">
           <div className="space-y-1 text-center">
@@ -184,9 +227,7 @@ function Showcase() {
               className="h-12 w-16 rounded-lg border"
               style={{ backgroundColor: 'var(--center-gut)' }}
             />
-            <span className="block text-xs text-muted-foreground">
-              gut 黄土
-            </span>
+            <span className="block text-xs text-muted-foreground">gut 緑</span>
           </div>
           <div className="space-y-1 text-center">
             <div
@@ -194,7 +235,7 @@ function Showcase() {
               style={{ backgroundColor: 'var(--center-heart)' }}
             />
             <span className="block text-xs text-muted-foreground">
-              heart 茜
+              heart 赤
             </span>
           </div>
           <div className="space-y-1 text-center">
@@ -202,7 +243,9 @@ function Showcase() {
               className="h-12 w-16 rounded-lg border"
               style={{ backgroundColor: 'var(--center-head)' }}
             />
-            <span className="block text-xs text-muted-foreground">head 藍</span>
+            <span className="block text-xs text-muted-foreground">
+              head 青（=primary）
+            </span>
           </div>
         </div>
       </section>
@@ -214,9 +257,9 @@ export default function DesignSystemPage() {
   if (process.env.NODE_ENV === 'production') notFound();
 
   return (
-    <main className="container mx-auto max-w-4xl space-y-12 p-6">
+    <main className="mx-auto w-full max-w-4xl space-y-12 p-6">
       <header>
-        <h1>デザインシステム（和モダン）見本帳</h1>
+        <h1>デザインシステム（ひとひ）見本帳</h1>
         <p className="text-sm text-muted-foreground">
           トークン・タイポ・コンポーネントの基準。ヘッダーのトグルでライト/ダークを確認。
         </p>

@@ -8,10 +8,14 @@ interface TodayPromptProps {
   date: string;
 }
 
-// 本文上の「今日の問い」。彩色アクセントは使わず、罫＋面昇格＋明朝で差をつける。
+// 書き出しのきっかけチップ。Q チップを押すと別の問いに入れ替わり、
+// 「じぶんで書く」で今日はチップ行ごと畳む（再訪で復活する軽い状態）。
 export function TodayPrompt({ initialText, date }: TodayPromptProps) {
   const [text, setText] = useState(initialText);
   const [pending, startTransition] = useTransition();
+  const [dismissed, setDismissed] = useState(false);
+
+  if (dismissed) return null;
 
   const handleRenew = () => {
     startTransition(async () => {
@@ -21,17 +25,23 @@ export function TodayPrompt({ initialText, date }: TodayPromptProps) {
   };
 
   return (
-    <div className="mb-6 border-l-2 bg-muted/40 px-4 py-3">
-      <p className="font-heading text-base leading-relaxed text-foreground">
-        {text}
-      </p>
+    <div className="mt-5 flex flex-wrap gap-2">
       <button
         type="button"
         onClick={handleRenew}
         disabled={pending}
-        className="mt-2 text-xs text-muted-foreground transition hover:text-foreground disabled:opacity-50"
+        title="べつの問いにする"
+        aria-label={`今日の問い: ${text}（押すとべつの問いにする）`}
+        className="rounded-lg border border-primary/25 bg-accent px-3.5 py-2 text-left text-[12.5px] text-primary transition hover:bg-primary/12 disabled:opacity-60"
       >
-        {pending ? '考えています…' : '問いを変える'}
+        {pending ? '考えています…' : `Q. ${text}`}
+      </button>
+      <button
+        type="button"
+        onClick={() => setDismissed(true)}
+        className="rounded-lg border px-3.5 py-2 text-[12.5px] text-muted-foreground transition hover:border-input hover:text-foreground"
+      >
+        じぶんで書く
       </button>
     </div>
   );

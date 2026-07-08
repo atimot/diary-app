@@ -1,4 +1,5 @@
 // components/diary/DiaryCalendar.tsx
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { CalendarDayLink } from '@/components/diary/CalendarDayLink';
 import {
@@ -14,69 +15,44 @@ interface DiaryCalendarProps {
   month: number; // 1..12
   today: string; // YYYY-MM-DD in Asia/Tokyo
   writtenDates: Set<string>; // YYYY-MM-DD set of dates that have diary entries
-  currentYearMonth: string; // YYYY-MM of "today" — for the "今月" button
+  currentYearMonth: string; // YYYY-MM of "today" — for the "今月へ" button
 }
 
 const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土'];
 
-function cellClasses(args: {
-  cell: CalendarCell;
-  written: boolean;
-  isSunday: boolean;
-}): string {
-  const { cell, written, isSunday } = args;
-  const base =
-    'aspect-square flex items-center justify-center rounded-lg text-sm';
+// 「今日」印はアンバーのリング。カード面からリングを浮かせる offset 付き。
+const TODAY_RING = 'ring-2 ring-streak ring-offset-2 ring-offset-card';
 
+function DayCell({ cell, written }: { cell: CalendarCell; written: boolean }) {
+  // 当月外・未来は非インタラクティブの淡い数字
   if (!cell.inMonth) {
-    return `${base} text-muted-foreground/30`;
+    return (
+      <div
+        className="grid h-9 place-items-center text-xs text-muted-foreground/30"
+        aria-hidden="true"
+      >
+        {cell.day}
+      </div>
+    );
   }
   if (cell.isFuture) {
-    return `${base} text-muted-foreground/50`;
-  }
-  if (written) {
-    // 日曜に書いた日は朱（--season）、それ以外は若葉（--primary）で塗る。
-    // bg-season 専用の foreground トークンは無いが、text-primary-foreground は
-    // 朱の上でも AA を満たす（light 4.82:1 / dark 4.97:1）ので緑セルと共用する。
-    const tone = isSunday
-      ? 'bg-season text-primary-foreground font-medium hover:opacity-90 transition'
-      : 'bg-primary text-primary-foreground font-medium hover:opacity-90 transition';
-    return cell.isToday
-      ? `${base} ${tone} ring-2 ring-foreground/40`
-      : `${base} ${tone}`;
-  }
-  // Past day without an entry (now clickable for backdate)
-  if (cell.isToday) {
-    return `${base} ring-2 ring-primary text-foreground hover:bg-accent transition`;
-  }
-  // 未記入・当月・過去・非today。日曜だけ朱。
-  return `${base} ${isSunday ? 'text-season' : 'text-muted-foreground'} hover:bg-accent transition`;
-}
-
-function DayCell({
-  cell,
-  written,
-  isSunday,
-}: {
-  cell: CalendarCell;
-  written: boolean;
-  isSunday: boolean;
-}) {
-  const className = cellClasses({ cell, written, isSunday });
-
-  if (!cell.inMonth || cell.isFuture) {
     return (
-      <div className={className} aria-hidden={!cell.inMonth}>
+      <div className="grid h-9 place-items-center text-xs text-muted-foreground/50">
         {cell.day}
       </div>
     );
   }
 
+  const circle =
+    'place-self-center grid size-[30px] place-items-center rounded-full text-xs tabular-nums transition';
+
   if (written) {
     return (
       <CalendarDayLink
         href={`/diary/${cell.iso}`}
-        className={className}
+        className={`${circle} bg-primary font-semibold text-primary-foreground hover:bg-primary/85 ${
+          cell.isToday ? `font-bold ${TODAY_RING}` : ''
+        }`}
         aria-current={cell.isToday ? 'date' : undefined}
         aria-label={`${cell.iso} の日記を見る`}
       >
@@ -89,7 +65,7 @@ function DayCell({
     return (
       <Link
         href="/"
-        className={className}
+        className={`${circle} text-foreground hover:bg-accent ${TODAY_RING}`}
         aria-current="date"
         aria-label="今日の日記を書く"
       >
@@ -98,11 +74,11 @@ function DayCell({
     );
   }
 
-  // Past day without an entry — clickable to backdate
+  // 未記入の過去日 — さかのぼって書ける
   return (
     <CalendarDayLink
       href={`/diary/${cell.iso}`}
-      className={className}
+      className={`${circle} text-muted-foreground hover:bg-accent`}
       aria-label={`${cell.iso} に日記を書く`}
     >
       {cell.day}
@@ -126,68 +102,63 @@ export function DiaryCalendar({
   const isShowingCurrent = shownYearMonth === currentYearMonth;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="rounded-xl border bg-card p-4 pb-3.5 shadow-card sm:p-[18px] sm:pb-3.5">
+      <div className="flex items-center justify-between px-1">
         <Link
           href={prevHref}
-          className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-          aria-label="前月"
+          className="grid size-[26px] place-items-center rounded-md text-muted-foreground transition hover:bg-accent hover:text-foreground"
+          aria-label={`前月（${prev.year}年${prev.month}月）へ`}
         >
-          {prev.year}年{prev.month}月
+          <ChevronLeft className="size-3.5" />
         </Link>
-        <h2 className="text-center font-heading text-lg tabular-nums">
+        <span className="text-[13px] font-semibold tabular-nums">
           {year}年{month}月
-        </h2>
+        </span>
         <Link
           href={nextHref}
-          className="rounded-md px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-          aria-label="翌月"
+          className="grid size-[26px] place-items-center rounded-md text-muted-foreground transition hover:bg-accent hover:text-foreground"
+          aria-label={`翌月（${next.year}年${next.month}月）へ`}
         >
-          {next.year}年{next.month}月
+          <ChevronRight className="size-3.5" />
         </Link>
       </div>
 
       {!isShowingCurrent && (
-        <div className="flex justify-center">
+        <div className="mt-2 flex justify-center">
           <Link
             href={`/history?ym=${currentYearMonth}`}
-            className="rounded-md border px-3 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+            className="rounded-md border px-2.5 py-1 text-[11px] text-muted-foreground transition hover:bg-accent hover:text-foreground"
           >
             今月へ
           </Link>
         </div>
       )}
 
-      <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground">
+      <div className="mt-3 grid grid-cols-7 text-center text-[11px] text-muted-foreground">
         {WEEKDAY_LABELS.map((label, i) => (
-          <div key={label} className={i === 0 ? 'py-1 text-season' : 'py-1'}>
+          <div key={label} className={i === 0 ? 'py-1 text-streak' : 'py-1'}>
             {label}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1">
-        {grid.weeks.flat().map((cell, index) => (
+      <div className="grid grid-cols-7 gap-y-1">
+        {grid.weeks.flat().map((cell) => (
           <DayCell
             key={cell.iso}
             cell={cell}
             written={writtenDates.has(cell.iso)}
-            isSunday={index % 7 === 0}
           />
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-muted-foreground">
+      <div className="mt-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-1.5 border-t px-1 pt-2.5 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-sm bg-primary" />
+          <span className="inline-block size-[9px] rounded-full bg-primary" />
           書いた日
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-sm border border-muted-foreground/40" />
-          書かなかった日
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-sm ring-2 ring-primary" />
+          <span className="inline-block size-[9px] rounded-full bg-primary ring-1 ring-streak ring-offset-1 ring-offset-card" />
           今日
         </span>
       </div>
