@@ -54,7 +54,9 @@ export default function ScreensPreviewPage() {
       <main className="mx-auto w-full max-w-[680px] px-6 pt-11 pb-20">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <div>
-            <p className="text-xs text-muted-foreground">おはようございます。</p>
+            <p className="text-xs text-muted-foreground">
+              おはようございます。
+            </p>
             <h1 className="mt-2 text-[22px] leading-snug">
               7月8日{' '}
               <span className="font-normal text-muted-foreground">水曜日</span>
@@ -62,14 +64,8 @@ export default function ScreensPreviewPage() {
           </div>
           <StreakPill streak={4} />
         </div>
-        <TodayPrompt
-          initialText="最近、夢中になれたことは？"
-          date={TODAY}
-        />
-        <DiaryEditor
-          entryDate={TODAY}
-          initialContent={RECENT[0].content}
-        />
+        <TodayPrompt initialText="最近、夢中になれたことは？" date={TODAY} />
+        <DiaryEditor entryDate={TODAY} initialContent={RECENT[0].content} />
       </main>
 
       <div className="border-t">
