@@ -51,9 +51,9 @@ export function RichTextEditor({
   });
 
   return (
-    <div className="rounded-xl border bg-card px-6 pt-6 pb-2.5 shadow-card sm:px-8 sm:pt-7 sm:pb-3">
+    <div className="rounded-xl border bg-card px-4 pt-[18px] pb-2 shadow-card sm:px-8 sm:pt-7 sm:pb-3">
       <EditorContent editor={editor} />
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t pt-2">
+      <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 border-t pt-1.5 sm:mt-5 sm:pt-2">
         <EditorToolbar editor={editor} />
         {footerEnd}
       </div>

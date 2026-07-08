@@ -7,12 +7,12 @@ export function AdviceCard({ advice }: AdviceCardProps) {
   return (
     <section
       aria-label="ひとことアドバイス"
-      className="rounded-xl border border-primary/20 bg-accent p-6 sm:p-[26px]"
+      className="rounded-xl border border-primary/20 bg-accent p-[18px] sm:p-6 md:p-[26px]"
     >
-      <h2 className="text-[12.5px] font-semibold tracking-normal text-primary">
+      <h2 className="text-xs font-semibold tracking-normal text-primary md:text-[12.5px]">
         ひとことアドバイス
       </h2>
-      <p className="mt-3 whitespace-pre-wrap text-[13.5px] leading-[2] text-foreground/90">
+      <p className="mt-2.5 whitespace-pre-wrap text-[13px] leading-[2] text-foreground/90 md:mt-3 md:text-[13.5px]">
         {advice}
       </p>
     </section>

@@ -25,7 +25,7 @@ export default async function DiaryDetailPage({ params }: PageProps) {
   const entry = await getDiaryEntry(date);
 
   return (
-    <main className="mx-auto w-full max-w-[680px] flex-1 px-6 pt-11 pb-20">
+    <main className="mx-auto w-full max-w-[680px] flex-1 px-4 pt-6 pb-11 md:px-6 md:pt-11 md:pb-20">
       <DiaryDateHeader date={date} />
       <DiaryEditor entryDate={date} initialContent={entry?.content ?? ''} />
     </main>

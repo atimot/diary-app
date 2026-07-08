@@ -103,8 +103,9 @@ export function DiaryEditor({
         onChange={handleChange}
         placeholder="今日はどんな1日でしたか？"
         footerEnd={
+          // SP は保存ボタンだけに絞る（字数はカード外の右下、⌘⏎ヒントは物理キーボード前提なので非表示）
           <div className="flex items-center gap-3">
-            <span className="text-xs text-muted-foreground tabular-nums">
+            <span className="hidden text-xs text-muted-foreground tabular-nums sm:inline">
               {charCount}字
             </span>
             <span className="hidden rounded-md border px-1.5 py-0.5 text-[11px] text-muted-foreground sm:inline">
@@ -120,6 +121,10 @@ export function DiaryEditor({
           </div>
         }
       />
+
+      <div className="mt-2.5 text-right text-[11px] text-muted-foreground tabular-nums sm:hidden">
+        {charCount}字
+      </div>
 
       <div className="mt-3 flex min-h-6 flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-3">

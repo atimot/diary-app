@@ -50,13 +50,72 @@ export function HeaderNav() {
 
   return (
     <header className="border-b">
-      <div className="mx-auto flex w-full max-w-[1120px] items-center px-6 py-[15px] lg:px-10">
-        <div className="flex min-w-0 flex-1 items-center">
-          <Link href="/" aria-label="ひとひ — 今日のページへ">
-            <BrandMark />
-          </Link>
+      <div className="mx-auto w-full max-w-[1120px]">
+        {/* SP: 1段目=ロゴ＋アクション / md以上: 1行3分割（ロゴ | 中央ナビ | アクション） */}
+        <div className="flex items-center justify-between px-4 pt-3 pb-2.5 md:justify-normal md:px-10 md:py-[15px]">
+          <div className="flex items-center md:min-w-0 md:flex-1">
+            <Link href="/" aria-label="ひとひ — 今日のページへ">
+              <BrandMark />
+            </Link>
+          </div>
+          <nav className="hidden items-center gap-[26px] md:flex">
+            {links.map((link) => {
+              const active = link.match(pathname);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={active ? 'page' : undefined}
+                  className={
+                    active
+                      ? 'relative px-0.5 py-2 text-[13px] font-semibold text-primary'
+                      : 'px-0.5 py-2 text-[13px] text-muted-foreground transition hover:text-foreground'
+                  }
+                >
+                  {link.label}
+                  {active && (
+                    // ヘッダー下罫に重なるアクティブ下線（py-[15px] ぶん下げる）
+                    <span
+                      className="absolute inset-x-0 -bottom-[15px] h-0.5 bg-primary"
+                      aria-hidden="true"
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+          <div className="flex items-center gap-2 md:min-w-0 md:flex-1 md:justify-end md:gap-2.5">
+            <ThemeToggle />
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  aria-label="アカウントメニュー"
+                  render={
+                    <button
+                      type="button"
+                      className="grid size-[27px] shrink-0 place-items-center rounded-full border text-[11.5px] font-semibold text-foreground/70 transition hover:text-foreground"
+                    />
+                  }
+                >
+                  {initial}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={handleSignOut}
+                  >
+                    <LogOut />
+                    サインアウト
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
-        <nav className="flex items-center gap-5 sm:gap-[26px]">
+        {/* SP: 2段目=3タブ均等ナビ。アクティブ下線はヘッダー下罫に重なる */}
+        <nav className="flex md:hidden">
           {links.map((link) => {
             const active = link.match(pathname);
             return (
@@ -66,15 +125,14 @@ export function HeaderNav() {
                 aria-current={active ? 'page' : undefined}
                 className={
                   active
-                    ? 'relative px-0.5 py-2 text-[13px] font-semibold text-primary'
-                    : 'px-0.5 py-2 text-[13px] text-muted-foreground transition hover:text-foreground'
+                    ? 'relative flex-1 pt-2.5 pb-[11px] text-center text-[13px] font-semibold text-primary'
+                    : 'flex-1 pt-2.5 pb-[11px] text-center text-[13px] text-muted-foreground transition hover:text-foreground'
                 }
               >
                 {link.label}
                 {active && (
-                  // ヘッダー下罫に重なるアクティブ下線（py-[15px] ぶん下げる）
                   <span
-                    className="absolute inset-x-0 -bottom-[15px] h-0.5 bg-primary"
+                    className="absolute inset-x-[32%] bottom-0 h-0.5 bg-primary"
                     aria-hidden="true"
                   />
                 )}
@@ -82,32 +140,6 @@ export function HeaderNav() {
             );
           })}
         </nav>
-        <div className="flex min-w-0 flex-1 items-center justify-end gap-2.5">
-          <ThemeToggle />
-          {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                aria-label="アカウントメニュー"
-                render={
-                  <button
-                    type="button"
-                    className="grid size-[27px] shrink-0 place-items-center rounded-full border text-[11.5px] font-semibold text-foreground/70 transition hover:text-foreground"
-                  />
-                }
-              >
-                {initial}
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
-                  <LogOut />
-                  サインアウト
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </div>
       </div>
     </header>
   );

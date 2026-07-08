@@ -25,21 +25,21 @@ export function TodayPrompt({ initialText, date }: TodayPromptProps) {
   };
 
   return (
-    <div className="mt-5 flex flex-wrap gap-2">
+    <div className="mt-3.5 flex flex-wrap gap-1.5 md:mt-5 md:gap-2">
       <button
         type="button"
         onClick={handleRenew}
         disabled={pending}
         title="べつの問いにする"
         aria-label={`今日の問い: ${text}（押すとべつの問いにする）`}
-        className="rounded-lg border border-primary/25 bg-accent px-3.5 py-2 text-left text-[12.5px] text-primary transition hover:bg-primary/12 disabled:opacity-60"
+        className="rounded-lg border border-primary/25 bg-accent px-3 py-2 text-left text-xs text-primary transition hover:bg-primary/12 disabled:opacity-60 md:px-3.5 md:text-[12.5px]"
       >
         {pending ? '考えています…' : `Q. ${text}`}
       </button>
       <button
         type="button"
         onClick={() => setDismissed(true)}
-        className="rounded-lg border px-3.5 py-2 text-[12.5px] text-muted-foreground transition hover:border-input hover:text-foreground"
+        className="rounded-lg border px-3 py-2 text-xs text-muted-foreground transition hover:border-input hover:text-foreground md:px-3.5 md:text-[12.5px]"
       >
         じぶんで書く
       </button>

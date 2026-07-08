@@ -74,7 +74,7 @@ export default function ScreensPreviewPage() {
             <h1 className="text-[21px]">これまで</h1>
             <RecordStats current={4} longest={9} total={23} />
           </div>
-          <div className="mt-6 grid items-start gap-6 lg:grid-cols-[352px_minmax(0,1fr)]">
+          <div className="mt-4 grid grid-cols-[minmax(0,1fr)] items-start gap-3.5 md:mt-6 lg:grid-cols-[352px_minmax(0,1fr)] lg:gap-6">
             <DiaryCalendar
               year={2026}
               month={7}

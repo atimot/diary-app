@@ -28,9 +28,9 @@ export function RecentEntries({ entries, gapDate }: RecentEntriesProps) {
   }
 
   return (
-    <div className="rounded-xl border bg-card px-5 py-1.5 shadow-card sm:px-6">
-      <div className="flex items-baseline justify-between border-b py-3.5">
-        <span className="text-[12.5px] font-semibold text-foreground/80">
+    <div className="rounded-xl border bg-card px-4 py-1 shadow-card sm:px-6 sm:py-1.5">
+      <div className="flex items-baseline justify-between border-b py-3 sm:py-3.5">
+        <span className="text-xs font-semibold text-foreground/80 sm:text-[12.5px]">
           さいきんの日記
         </span>
       </div>
@@ -41,7 +41,7 @@ export function RecentEntries({ entries, gapDate }: RecentEntriesProps) {
             <CalendarDayLink
               key={`gap-${row.date}`}
               href={`/diary/${row.date}`}
-              className="flex items-center justify-center gap-2 border-b py-3.5 text-xs text-muted-foreground transition last:border-b-0 hover:text-primary"
+              className="flex items-center justify-center gap-2 border-b py-3 text-[11.5px] text-muted-foreground transition last:border-b-0 hover:text-primary sm:py-3.5 sm:text-xs"
             >
               {gap.monthDay}は空白です — さかのぼって書く
             </CalendarDayLink>
@@ -55,11 +55,11 @@ export function RecentEntries({ entries, gapDate }: RecentEntriesProps) {
             key={row.entryDate}
             href={`/diary/${row.entryDate}`}
             aria-label={`${monthDay}の日記を見る`}
-            className="flex items-center gap-4 border-b px-0.5 py-3.5 transition last:border-b-0 hover:bg-accent sm:gap-[18px]"
+            className="flex items-center gap-3 border-b px-0.5 py-3 transition last:border-b-0 hover:bg-accent sm:gap-[18px] sm:py-3.5"
           >
-            <span className="flex w-14 shrink-0 flex-col">
+            <span className="flex w-[46px] shrink-0 flex-col sm:w-14">
               <span
-                className={`text-[13.5px] font-semibold tabular-nums ${
+                className={`text-[13px] font-semibold tabular-nums sm:text-[13.5px] ${
                   isSunday ? 'text-season' : 'text-foreground'
                 }`}
               >
@@ -73,10 +73,11 @@ export function RecentEntries({ entries, gapDate }: RecentEntriesProps) {
                 {weekday}
               </span>
             </span>
-            <span className="min-w-0 flex-1 truncate text-[13.5px] text-foreground/85">
+            <span className="min-w-0 flex-1 truncate text-[13px] text-foreground/85 sm:text-[13.5px]">
               {excerptFromMarkdown(row.content)}
             </span>
-            <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">
+            {/* 字数は SP では省略（カンプ 5b 準拠） */}
+            <span className="hidden shrink-0 text-[11px] text-muted-foreground tabular-nums sm:inline">
               {charCountFromMarkdown(row.content)}字
             </span>
           </CalendarDayLink>

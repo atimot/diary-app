@@ -50,15 +50,15 @@ export default async function HistoryPage({ searchParams }: PageProps) {
   const total = dates.length;
 
   return (
-    <main className="mx-auto w-full max-w-[1120px] flex-1 px-6 pt-10 pb-20 lg:px-10">
+    <main className="mx-auto w-full max-w-[1120px] flex-1 px-4 pt-6 pb-11 md:px-6 md:pt-10 md:pb-20 lg:px-10">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h1 className="text-[21px]">これまで</h1>
+        <h1 className="text-[19px] md:text-[21px]">これまで</h1>
         <RecordStats current={current} longest={longest} total={total} />
       </div>
 
       {/* 1fr は暗黙の minmax(auto,1fr) で「さいきんの日記」の nowrap 長文に
           引っ張られてはみ出しうるため、minmax(0,1fr) で確実に縮める（カンプ準拠） */}
-      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[352px_minmax(0,1fr)]">
+      <div className="mt-4 grid grid-cols-[minmax(0,1fr)] items-start gap-3.5 md:mt-6 lg:grid-cols-[352px_minmax(0,1fr)] lg:gap-6">
         <DiaryCalendar
           year={year}
           month={month}

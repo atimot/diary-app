@@ -10,7 +10,7 @@ export function DiaryDateHeader({ date }: DiaryDateHeaderProps) {
   return (
     <header>
       <p className="text-xs text-muted-foreground tabular-nums">{year}</p>
-      <h1 className="mt-2 text-[22px] leading-snug">
+      <h1 className="mt-1.5 text-xl leading-snug md:mt-2 md:text-[22px]">
         {monthDay}{' '}
         <span className="font-normal text-muted-foreground">{weekday}</span>
       </h1>

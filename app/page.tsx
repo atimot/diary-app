@@ -21,15 +21,13 @@ export default async function HomePage() {
   const greeting = greetingForHour(currentHourInTokyo());
 
   return (
-    <main className="mx-auto w-full max-w-[680px] flex-1 px-6 pt-11 pb-20">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <div>
-          <p className="text-xs text-muted-foreground">{greeting}</p>
-          <h1 className="mt-2 text-[22px] leading-snug">
-            {monthDay}{' '}
-            <span className="font-normal text-muted-foreground">{weekday}</span>
-          </h1>
-        </div>
+    <main className="mx-auto w-full max-w-[680px] flex-1 px-4 pt-6 pb-11 md:px-6 md:pt-11 md:pb-20">
+      <p className="text-xs text-muted-foreground">{greeting}</p>
+      <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2.5 md:mt-2">
+        <h1 className="text-xl leading-snug md:text-[22px]">
+          {monthDay}{' '}
+          <span className="font-normal text-muted-foreground">{weekday}</span>
+        </h1>
         <StreakPill streak={streak} />
       </div>
       <TodayPrompt initialText={prompt.text} date={date} />
