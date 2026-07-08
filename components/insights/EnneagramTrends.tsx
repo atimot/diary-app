@@ -15,7 +15,9 @@ interface EnneagramTrendsProps {
 }
 
 // 「今週のこころの傾き」全幅カード。
-// 左=タイプの読み解き / 中=シンボル図 / 右=上位タイプのバー＋センター凡例。
+// SP はカンプ 5c の縦順（見出し → 図 → 本文 → 上位タイプ → 凡例 → 免責）、
+// lg 以上は 4c の3カラム（左=読み解き / 中=図 / 右=バー）。DOM 順を SP に合わせ、
+// lg では grid-template-areas で3カラムに再配置する。
 export function EnneagramTrends({
   snapshot,
   className = '',
@@ -30,21 +32,23 @@ export function EnneagramTrends({
   return (
     <section
       aria-label="今週のこころの傾き"
-      className={`rounded-xl border bg-card p-6 shadow-card sm:p-7 ${className}`}
+      className={`rounded-xl border bg-card p-[18px] shadow-card sm:p-6 md:p-7 ${className}`}
     >
-      <div className="flex flex-col gap-8 lg:flex-row lg:gap-10">
-        <div className="min-w-0 lg:flex-[1.1]">
-          <h2 className="text-[12.5px] font-semibold tracking-normal text-primary">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1.1fr)_196px_minmax(0,1fr)] lg:grid-rows-[auto_auto_auto] lg:gap-x-10 lg:gap-y-3.5 lg:[grid-template-areas:'head_figure_bars'_'text_figure_bars'_'note_figure_bars']">
+        <div className="lg:[grid-area:head]">
+          <h2 className="text-xs font-semibold tracking-normal text-primary md:text-[12.5px]">
             今週のこころの傾き
           </h2>
           <div className="mt-3 flex flex-wrap items-baseline gap-2.5">
             <span
-              className="text-3xl font-bold leading-none tracking-tight"
+              className="text-[27px] font-bold leading-none tracking-tight lg:text-3xl"
               style={{ color }}
             >
               {typeCode(dominant, wingType)}
             </span>
-            <span className="text-[15px] font-semibold">{type.name}</span>
+            <span className="text-sm font-semibold lg:text-[15px]">
+              {type.name}
+            </span>
             <span
               className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
               style={{
@@ -55,25 +59,23 @@ export function EnneagramTrends({
               {CENTER_SHORT_LABELS[type.center]}タイプ
             </span>
           </div>
-          <p className="mt-2 text-[11.5px] text-muted-foreground">
+          <p className="mt-2 text-[11px] text-muted-foreground md:text-[11.5px]">
             ウイング: {wingInfo.number} {wingInfo.name}
-          </p>
-          <p className="mt-3.5 whitespace-pre-wrap text-[13px] leading-[1.95] text-foreground/90">
-            {snapshot.rationale}
-          </p>
-          <p className="mt-3 text-[11px] leading-[1.7] text-muted-foreground">
-            最近7日分の日記から読み取った傾向で、占いや確定診断ではありません。
           </p>
         </div>
 
         <EnneagramSymbol
           dominant={dominant}
           wing={wingType}
-          className="w-full max-w-[196px] shrink-0 self-center lg:self-start"
+          className="mx-auto w-full max-w-[216px] lg:mx-0 lg:max-w-[196px] lg:self-start lg:[grid-area:figure]"
         />
 
-        <div className="flex min-w-0 flex-1 flex-col gap-3">
-          <h3 className="text-[11.5px] font-semibold tracking-normal text-foreground/80">
+        <p className="whitespace-pre-wrap text-[12.5px] leading-[1.95] text-foreground/90 lg:text-[13px] lg:[grid-area:text]">
+          {snapshot.rationale}
+        </p>
+
+        <div className="flex min-w-0 flex-col gap-2.5 lg:gap-3 lg:[grid-area:bars]">
+          <h3 className="text-[11px] font-semibold tracking-normal text-foreground/80 md:text-[11.5px]">
             今週の上位タイプ
           </h3>
           <EnneagramTopBars items={topTypes(scores, 5)} />
@@ -89,6 +91,10 @@ export function EnneagramTrends({
             ))}
           </div>
         </div>
+
+        <p className="text-[11px] leading-[1.7] text-muted-foreground lg:self-start lg:[grid-area:note]">
+          最近7日分の日記から読み取った傾向で、占いや確定診断ではありません。
+        </p>
       </div>
     </section>
   );

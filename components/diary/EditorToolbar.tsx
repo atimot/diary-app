@@ -39,7 +39,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         variant={state?.isBold ? 'secondary' : 'ghost'}
         aria-pressed={state?.isBold ?? false}
         aria-label="太字"
-        className="text-muted-foreground hover:text-foreground"
+        className="size-8 text-muted-foreground hover:text-foreground sm:size-7"
         onMouseDown={keepSelection}
         onClick={() => editor.chain().focus().toggleBold().run()}
       >
@@ -51,7 +51,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         variant={state?.isItalic ? 'secondary' : 'ghost'}
         aria-pressed={state?.isItalic ?? false}
         aria-label="斜体"
-        className="text-muted-foreground hover:text-foreground"
+        className="size-8 text-muted-foreground hover:text-foreground sm:size-7"
         onMouseDown={keepSelection}
         onClick={() => editor.chain().focus().toggleItalic().run()}
       >
@@ -63,7 +63,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         variant={state?.isBullet ? 'secondary' : 'ghost'}
         aria-pressed={state?.isBullet ?? false}
         aria-label="箇条書き"
-        className="text-muted-foreground hover:text-foreground"
+        className="size-8 text-muted-foreground hover:text-foreground sm:size-7"
         onMouseDown={keepSelection}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
       >
@@ -75,7 +75,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         variant={state?.isQuote ? 'secondary' : 'ghost'}
         aria-pressed={state?.isQuote ?? false}
         aria-label="引用"
-        className="text-muted-foreground hover:text-foreground"
+        className="size-8 text-muted-foreground hover:text-foreground sm:size-7"
         onMouseDown={keepSelection}
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
       >
