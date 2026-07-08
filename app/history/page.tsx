@@ -56,7 +56,9 @@ export default async function HistoryPage({ searchParams }: PageProps) {
         <RecordStats current={current} longest={longest} total={total} />
       </div>
 
-      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[352px_1fr]">
+      {/* 1fr は暗黙の minmax(auto,1fr) で「さいきんの日記」の nowrap 長文に
+          引っ張られてはみ出しうるため、minmax(0,1fr) で確実に縮める（カンプ準拠） */}
+      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[352px_minmax(0,1fr)]">
         <DiaryCalendar
           year={year}
           month={month}
