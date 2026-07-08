@@ -18,6 +18,12 @@ function formatDateTime(value: Date): string {
   }).format(value);
 }
 
+// 期間表示は「7/1〜7/7」の短い形式にする（YYYY-MM-DD → M/D）
+function shortDate(iso: string): string {
+  const [, m, d] = iso.split('-').map(Number);
+  return `${m}/${d}`;
+}
+
 export default async function InsightsPage() {
   const [entryCount, insight, enneagram] = await Promise.all([
     countDiaryEntries(),
@@ -29,9 +35,9 @@ export default async function InsightsPage() {
   if (entryCount < MIN_ENTRIES) {
     const remaining = MIN_ENTRIES - entryCount;
     return (
-      <main className="container mx-auto max-w-3xl p-6">
-        <h1 className="mb-6 text-2xl font-bold">あなたの傾向</h1>
-        <p className="text-muted-foreground">
+      <main className="mx-auto w-full max-w-[1120px] flex-1 px-6 pt-10 pb-20 lg:px-10">
+        <h1 className="text-[21px]">気づき</h1>
+        <p className="mt-4 text-sm text-muted-foreground">
           AI 分析を見るには日記が {MIN_ENTRIES} 件必要です。あと {remaining}{' '}
           件書いてみましょう。
         </p>
@@ -42,51 +48,61 @@ export default async function InsightsPage() {
   // state 2: 件数は足りているが、insight も enneagram もまだ生成していない
   if (!insight && !enneagram) {
     return (
-      <main className="container mx-auto max-w-3xl p-6">
-        <h1 className="mb-6 text-2xl font-bold">あなたの傾向</h1>
-        <p className="mb-4 text-muted-foreground">
+      <main className="mx-auto w-full max-w-[1120px] flex-1 px-6 pt-10 pb-20 lg:px-10">
+        <h1 className="text-[21px]">気づき</h1>
+        <p className="mt-4 mb-4 text-sm text-muted-foreground">
           日記が {entryCount} 件溜まりました。AI
           に最近の傾向を分析させてみましょう。
         </p>
-        <RegenerateButton label="AI に分析させる" pendingLabel="分析中…" />
+        <RegenerateButton
+          label="AI に分析させる"
+          pendingLabel="分析中…"
+          variant="default"
+        />
       </main>
     );
   }
 
   // state 3: 少なくとも片方のキャッシュあり
   return (
-    <main className="container mx-auto max-w-3xl space-y-10 p-6">
-      <header>
-        <h1 className="text-2xl font-bold">あなたの傾向</h1>
-        {insight && (
-          <p className="mt-1 text-sm text-muted-foreground">
-            {insight.periodStart} 〜 {insight.periodEnd} の日記{' '}
-            {Array.isArray(insight.sourceEntryIds)
-              ? insight.sourceEntryIds.length
-              : 0}{' '}
-            件から · {formatDateTime(insight.createdAt)} に生成
-          </p>
-        )}
-      </header>
-
-      {insight && (
-        <>
-          <section className="space-y-2">
-            <h2 className="text-lg font-semibold">最近のあなたの動向</h2>
-            <p className="whitespace-pre-wrap leading-loose">
-              {insight.summary}
+    <main className="mx-auto w-full max-w-[1120px] flex-1 px-6 pt-10 pb-20 lg:px-10">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[21px]">気づき</h1>
+          {insight && (
+            <p className="mt-2 text-[11.5px] text-muted-foreground">
+              {shortDate(insight.periodStart)}〜{shortDate(insight.periodEnd)}・
+              {Array.isArray(insight.sourceEntryIds)
+                ? insight.sourceEntryIds.length
+                : 0}
+              件の日記から ・ {formatDateTime(insight.createdAt)} に生成
             </p>
-          </section>
+          )}
+        </div>
+        <RegenerateButton />
+      </div>
 
-          <AdviceCard advice={insight.advice} />
-        </>
-      )}
-
-      {enneagram && <EnneagramTrends snapshot={enneagram} />}
-
-      <footer className="border-t pt-4">
-        <RegenerateButton label="再生成する" pendingLabel="分析中…" />
-      </footer>
+      <div className="mt-6 grid gap-5 lg:grid-cols-[1.35fr_1fr]">
+        {insight && (
+          <>
+            <section
+              aria-label="今週の要約"
+              className="rounded-xl border bg-card p-6 shadow-card sm:p-7"
+            >
+              <h2 className="text-[12.5px] font-semibold tracking-normal text-primary">
+                こんな1週間でした
+              </h2>
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-[2.05]">
+                {insight.summary}
+              </p>
+            </section>
+            <AdviceCard advice={insight.advice} />
+          </>
+        )}
+        {enneagram && (
+          <EnneagramTrends snapshot={enneagram} className="lg:col-span-2" />
+        )}
+      </div>
     </main>
   );
 }

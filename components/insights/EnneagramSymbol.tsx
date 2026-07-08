@@ -8,6 +8,7 @@ import {
 interface EnneagramSymbolProps {
   dominant: EnneagramTypeNumber;
   wing: EnneagramTypeNumber;
+  className?: string;
 }
 
 const CX = 100;
@@ -41,13 +42,17 @@ function polyPoints(types: EnneagramTypeNumber[]): string {
     .join(' ');
 }
 
-export function EnneagramSymbol({ dominant, wing }: EnneagramSymbolProps) {
+export function EnneagramSymbol({
+  dominant,
+  wing,
+  className = 'mx-auto w-full max-w-[260px]',
+}: EnneagramSymbolProps) {
   return (
     <svg
       viewBox="0 0 200 200"
       role="img"
       aria-label={`エニアグラム・シンボル図。主タイプ ${dominant}、ウイング ${wing} を強調。`}
-      className="mx-auto w-full max-w-[260px]"
+      className={className}
     >
       <title>{`エニアグラム・シンボル図（${dominant}w${wing}）`}</title>
       <circle

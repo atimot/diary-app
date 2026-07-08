@@ -1,19 +1,24 @@
 'use client';
 
 import { EditorContent, useEditor } from '@tiptap/react';
+import type { ReactNode } from 'react';
 import { EditorToolbar } from '@/components/diary/EditorToolbar';
 import { createDiaryEditorExtensions } from '@/lib/editor/diary-extensions';
 
 interface RichTextEditorProps {
   value: string;
-  onChange: (markdown: string) => void;
+  // textLength は空白を除いた本文文字数（字数表示用）
+  onChange: (markdown: string, textLength: number) => void;
   placeholder?: string;
+  // カード下部フッターの右側（字数・保存ボタン等）を親から差し込む
+  footerEnd?: ReactNode;
 }
 
 export function RichTextEditor({
   value,
   onChange,
   placeholder,
+  footerEnd,
 }: RichTextEditorProps) {
   const editor = useEditor({
     // プレースホルダーは公式 Placeholder 拡張（diary-extensions に集約）で描画する。
@@ -26,18 +31,32 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          'prose prose-neutral dark:prose-invert max-w-none min-h-[15rem] px-3 py-2 text-base outline-none',
+          'prose prose-neutral dark:prose-invert max-w-none min-h-[16rem] text-[15px] outline-none',
+      },
+      // ⌘⏎ / Ctrl+Enter で保存（囲んでいる form を submit する）
+      handleKeyDown: (view, event) => {
+        if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+          (view.dom as HTMLElement).closest('form')?.requestSubmit();
+          return true;
+        }
+        return false;
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getMarkdown());
+      onChange(
+        editor.getMarkdown(),
+        editor.getText().replace(/\s/g, '').length,
+      );
     },
   });
 
   return (
-    <div className="rounded-xl border bg-transparent">
-      <EditorToolbar editor={editor} />
+    <div className="rounded-xl border bg-card px-6 pt-6 pb-2.5 shadow-card sm:px-8 sm:pt-7 sm:pb-3">
       <EditorContent editor={editor} />
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t pt-2">
+        <EditorToolbar editor={editor} />
+        {footerEnd}
+      </div>
     </div>
   );
 }

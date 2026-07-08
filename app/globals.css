@@ -8,14 +8,19 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* 本文・見出しとも端末標準ゴシック（Webフォント0本）。
+     `system-ui` 一語は Windows で細い Yu Gothic UI を呼ぶため、和文書体を名指しする。 */
   --font-sans:
     -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Sans",
     "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, "Noto Sans JP",
     sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* ひとひ刷新（2026-07）で明朝見出しを退役。見出しもゴシック（weight で差をつける）。
+     var(--font-sans) の自己参照は Tailwind が解決できないためリテラルを再掲する。 */
   --font-heading:
-    var(--font-noto-serif-jp), "Hiragino Mincho ProN", "Yu Mincho", YuMincho,
-    serif;
+    -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Sans",
+    "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, "Noto Sans JP",
+    sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -34,6 +39,8 @@
   --color-border: var(--border);
   --color-destructive: var(--destructive);
   --color-season: var(--season);
+  --color-streak: var(--streak);
+  --color-streak-soft: var(--streak-soft);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -46,6 +53,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  /* カードの淡い影。ダークでは無効化（--card-shadow 側で切替）。 */
+  --shadow-card: var(--card-shadow);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -55,81 +64,89 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ひとひパレット: クールなブルーグレー地 × 白カード × 青アクセント。
+   --streak はアンバー（継続・今日）、--season はテラコッタ（日曜）専用。 */
 :root {
-  --background: #f4f1ea;
-  --foreground: #1b1916;
-  --card: #fbf9f4;
-  --card-foreground: #1b1916;
-  --popover: #fbf9f4;
-  --popover-foreground: #1b1916;
-  --primary: #5f7a4f;
-  --primary-foreground: #f4f1ea;
-  --secondary: #efeae0;
-  --secondary-foreground: #1b1916;
-  --muted: #f0ece2;
-  --muted-foreground: #8c857b;
-  --accent: #f0ece2;
-  --accent-foreground: #1b1916;
+  --background: oklch(0.982 0.004 250);
+  --foreground: oklch(0.28 0.014 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.28 0.014 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.28 0.014 260);
+  --primary: oklch(0.56 0.145 252);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.004 250);
+  --secondary-foreground: oklch(0.28 0.014 260);
+  --muted: oklch(0.95 0.004 250);
+  --muted-foreground: oklch(0.54 0.016 258);
+  --accent: oklch(0.56 0.145 252 / 7%);
+  --accent-foreground: oklch(0.28 0.014 260);
   --destructive: oklch(0.577 0.245 27.325);
-  --season: #b9421f;
-  --border: #e0d9cc;
-  --input: #e0d9cc;
-  --ring: #5f7a4f;
-  --center-gut: oklch(0.55 0.085 75);
-  --center-heart: oklch(0.52 0.12 25);
-  --center-head: oklch(0.44 0.09 255);
+  --season: oklch(0.55 0.1 40);
+  --streak: oklch(0.58 0.115 80);
+  --streak-soft: oklch(0.83 0.125 92 / 20%);
+  --border: oklch(0.93 0.006 250);
+  --input: oklch(0.92 0.007 250);
+  --ring: oklch(0.56 0.145 252);
+  --card-shadow: 0 1px 3px oklch(0.4 0.04 255 / 5%);
+  --center-gut: oklch(0.6 0.11 140);
+  --center-heart: oklch(0.62 0.13 25);
+  --center-head: oklch(0.56 0.145 252);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.982 0.006 72);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: #e0d9cc;
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.982 0.004 250);
+  --sidebar-foreground: oklch(0.28 0.014 260);
+  --sidebar-primary: oklch(0.56 0.145 252);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.95 0.004 250);
+  --sidebar-accent-foreground: oklch(0.28 0.014 260);
+  --sidebar-border: oklch(0.93 0.006 250);
+  --sidebar-ring: oklch(0.56 0.145 252);
 }
 
 .dark {
-  --background: #15181d;
-  --foreground: #e9e7e1;
-  --card: #1b1f25;
-  --card-foreground: #e9e7e1;
-  --popover: #2a313b;
-  --popover-foreground: #e9e7e1;
-  --primary: #93b277;
-  --primary-foreground: #15181d;
-  --secondary: #232830;
-  --secondary-foreground: #e9e7e1;
-  --muted: #232830;
-  --muted-foreground: #8a909c;
-  --accent: #232830;
-  --accent-foreground: #e9e7e1;
+  --background: oklch(0.225 0.018 260);
+  --foreground: oklch(0.92 0.008 255);
+  --card: oklch(0.265 0.018 260);
+  --card-foreground: oklch(0.92 0.008 255);
+  --popover: oklch(0.3 0.018 260);
+  --popover-foreground: oklch(0.92 0.008 255);
+  --primary: oklch(0.72 0.125 252);
+  --primary-foreground: oklch(0.2 0.03 260);
+  --secondary: oklch(0.32 0.018 260);
+  --secondary-foreground: oklch(0.92 0.008 255);
+  --muted: oklch(0.32 0.018 260);
+  --muted-foreground: oklch(0.62 0.015 258);
+  --accent: oklch(0.72 0.125 252 / 10%);
+  --accent-foreground: oklch(0.92 0.008 255);
   --destructive: oklch(0.704 0.191 22.216);
-  --season: #cf6b4f;
-  --border: #2b313a;
-  --input: #2b313a;
-  --ring: #93b277;
-  --center-gut: oklch(0.75 0.085 78);
+  --season: oklch(0.78 0.1 45);
+  --streak: oklch(0.85 0.115 90);
+  --streak-soft: oklch(0.85 0.115 90 / 14%);
+  --border: oklch(0.33 0.018 260);
+  --input: oklch(0.36 0.018 260);
+  --ring: oklch(0.72 0.125 252);
+  --card-shadow: 0 0 oklch(0 0 0 / 0%);
+  --center-gut: oklch(0.7 0.1 140);
   --center-heart: oklch(0.7 0.12 25);
-  --center-head: oklch(0.72 0.1 258);
+  --center-head: oklch(0.72 0.125 252);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.215 0.006 70);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: #2b313a;
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar: oklch(0.265 0.018 260);
+  --sidebar-foreground: oklch(0.92 0.008 255);
+  --sidebar-primary: oklch(0.72 0.125 252);
+  --sidebar-primary-foreground: oklch(0.2 0.03 260);
+  --sidebar-accent: oklch(0.32 0.018 260);
+  --sidebar-accent-foreground: oklch(0.92 0.008 255);
+  --sidebar-border: oklch(0.33 0.018 260);
+  --sidebar-ring: oklch(0.72 0.125 252);
 }
 
 @layer base {
@@ -146,9 +163,10 @@
   h2,
   h3 {
     font-family: var(--font-heading);
-    /* Noto Serif JP（可変・既定 400）の見出しに墨の存在感を持たせ、dark での痩せを防ぐ。
-       font-bold 等のユーティリティを当てた見出し（insights/history）はそちらが優先される。 */
-    font-weight: 500;
+    /* ひとひの見出しはゴシック 600＋わずかな正トラッキング。
+       font-bold 等のユーティリティを当てた見出しはそちらが優先される。 */
+    font-weight: 600;
+    letter-spacing: 0.03em;
   }
 }
 
@@ -166,13 +184,11 @@
   height: 0;
 }
 
-/* 編集(Tiptap)・表示(react-markdown)双方が .prose を使うため1か所で和モダン化。
-   見出し明朝は PR1 の base ルールでも効くが、レイヤ順の取りこぼし回避に明示する
-   (typography プラグインは font-family を設定しないので競合しない)。
-   .prose 利用は現状日記のみ。将来 prose を使う画面にも同じ読み物体裁が乗るのは望ましい。 */
+/* 日記の読み物本文（Tiptap エディタが .prose を使う）。
+   ひとひは 15px / line-height 2.05（和文への正トラッキングは載せない）。 */
 .prose :is(h1, h2, h3) {
   font-family: var(--font-heading);
 }
 .prose p {
-  line-height: 1.9;
+  line-height: 2.05;
 }

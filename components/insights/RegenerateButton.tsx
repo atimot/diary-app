@@ -1,17 +1,20 @@
 'use client';
 
+import type { VariantProps } from 'class-variance-authority';
 import { useState, useTransition } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button, type buttonVariants } from '@/components/ui/button';
 import { regenerateInsight } from '@/lib/actions/insight';
 
 interface RegenerateButtonProps {
   label?: string;
   pendingLabel?: string;
+  variant?: VariantProps<typeof buttonVariants>['variant'];
 }
 
 export function RegenerateButton({
-  label = '再生成する',
+  label = 'もう一度分析する',
   pendingLabel = '分析中…',
+  variant = 'outline',
 }: RegenerateButtonProps) {
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -28,7 +31,17 @@ export function RegenerateButton({
 
   return (
     <div className="space-y-2">
-      <Button type="button" onClick={handleClick} disabled={isPending}>
+      <Button
+        type="button"
+        variant={variant}
+        onClick={handleClick}
+        disabled={isPending}
+        className={
+          variant === 'outline'
+            ? 'text-xs text-foreground/80 hover:border-primary/40 hover:bg-transparent hover:text-primary'
+            : undefined
+        }
+      >
         {isPending ? pendingLabel : label}
       </Button>
       {errorMessage && (

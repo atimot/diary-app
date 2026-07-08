@@ -4,16 +4,17 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
-# デザインシステム（和モダン）— 憲法
+# デザインシステム（ひとひ）— 憲法
 
-全画面の作成・変更でこれに従う。詳細・実例は `/dev/design`、根拠は `docs/superpowers/specs/2026-06-26-design-system-design.md`。
+全画面の作成・変更でこれに従う。詳細・実例は `/dev/design`。2026-07 の「デザイン一新」で和モダン（墨×生成り×若葉・明朝見出し）から **ひとひ**（ブルーグレー地×白カード×青アクセント・全ゴシック）へ全面刷新した（元カンプは Claude Design プロジェクト『プロジェクトの設計刷新』の `デザイン一新.dc.html`）。
 
 0. **競合したらトークンが勝つ**（この憲法が既定挙動より優先）。
-1. 色は必ずトークン（`bg-primary` `text-foreground` `text-season` / `var(--…)`）。**生hex・`rgb()/hsl()/oklch()` の色リテラル・任意色クラス・インラインstyleの色リテラル禁止**（例外: `app/globals.css` と `app/dev/**`）。`npm run lint:design` で機械的に弾く。
-2. 見出しは `font-heading`（明朝 Noto Serif JP・唯一の self-host Webフォント）、本文・UIは既定（端末標準ゴシックのシステムフォントスタック）。font-size・余白・角丸は spec §① のスケールから。**11px未満禁止**。
-3. アクセント（若葉 `--primary`）は **1画面に1〜2箇所**。朱（`--season`）は日曜・季節の差し色のみ。削除など危険操作は `--destructive`。
-4. 深度は**影でなく罫＋明度差**（4面: background→card→muted→popover）。新規 drop-shadow 禁止（focus ring 等の機能的影は可）。
-5. 新パターン追加前に `/dev/design` と既存部品を確認し**再利用優先**。**ダーク対応必須**（両モードで成立させる）。
+1. 色は必ずトークン（`bg-primary` `text-muted-foreground` `text-season` `text-streak` / `var(--…)`）。**生hex・`rgb()/hsl()/oklch()` の色リテラル・任意色クラス・インラインstyleの色リテラル禁止**（例外: `app/globals.css`、`app/dev/**`、`components/ui/**`）。`npm run lint:design` で機械的に弾く。
+2. 書体は**全てゴシック（端末標準のシステムフォントスタック・Webフォント0本）**。見出しも `font-heading`（=ゴシック、base で weight 600・字間 .03em）。明朝 Noto Serif JP は退役済み — **和文 Webフォントを新たに足さない**。**11px未満禁止**（カンプの 10〜10.5px 指定は 11px に丸める）。
+3. アクセントの役割分担: 青（`--primary`）はナビ active・主ボタン・カードラベル・書いた日など画面の主役（乱用しない）。アンバー（`--streak` / 面は `--streak-soft`）は**継続と「今日」だけ**（つづきピル・今日リング・カレンダー曜日ヘッダの日曜）。テラコッタ（`--season`）は**リスト中の日曜表示だけ**。危険操作は `--destructive`。
+4. 深度は**罫＋明度差＋light のみの淡い影トークン**（`shadow-card` = `--card-shadow`、ダークでは無効）。それ以外の drop-shadow 追加禁止（focus ring 等の機能的影は可）。
+5. コンテナは2段階: **集中幅 680px**（今日・個別日記・サインイン）と**ボード幅 max-w-[1120px]+px-10**（これまで・気づき、ヘッダーと同じ罫に揃う）。
+6. 新パターン追加前に `/dev/design` と既存部品を確認し**再利用優先**。**ダーク対応必須**（両モードで成立させる）。
 
 注: ガードレール(grep)が防ぐのは「生の色リテラルの混入」まで。トークンの*意味的*誤用・スケール逸脱は `/dev/design`＋レビューで担保する（過信しない）。
 
@@ -48,9 +49,9 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 
 ## パフォーマンス: クライアントJS / プリフェッチ（体感の重さ）
 - 実測（本番・実ブラウザの Resource Timing）でホーム `/` は **JS 解凍後 1.37MB**、最大チャンク 648KB が **Tiptap/ProseMirror(+marked)**。`DiaryEditor` が `RichTextEditor` を静的 import していたため、閲覧（preview）でもエディタを丸ごと読んでいた。
-- **対策**: `DiaryEditor`（`'use client'`）内で `RichTextEditor` / `DiaryMarkdown` を `next/dynamic` でコード分割し、`{activeTab === … && …}` で**タブ選択時のみマウント**。これで `/` の First Load JS が 1393KB→784KB（約44%減、転送 gz 427→250KB）。`content` は hidden input 経由で送るのでエディタ unmount でも保存は壊れない。
-  - **`RichTextEditor`(Tiptap) は `ssr:false` 必須**（`immediatelyRender:false` + browser API 依存）。編集タブを開くまで読まない。
-  - **`DiaryMarkdown`(react-markdown) は `ssr` 既定(true)のまま**にする。`ssr:false` にするとプレビュー本文がSSRされず（生HTMLに `.prose` が乗らず）スケルトンのちらつき／背景タブ空表示になる（`#33` で踏んで `#35` で修正）。dynamic は維持するので新規エントリ（編集タブ既定）では chunk を読まない。
+- **対策（当時）**: `DiaryEditor`（`'use client'`）内で `RichTextEditor` / `DiaryMarkdown` を `next/dynamic` でコード分割し、タブ選択時のみマウント。これで `/` の First Load JS が 1393KB→784KB（約44%減、転送 gz 427→250KB）。`content` は hidden input 経由で送るのでエディタ unmount でも保存は壊れない。
+  - **2026-07 のひとひ刷新で編集/プレビュータブを廃止し WYSIWYG 一本化**。エディタは常時マウントになり Tiptap chunk は `/` の初期表示で読む（書く画面が主役のための意図的なトレードオフ）。`DiaryMarkdown`(react-markdown) は役目を終えて削除済み。
+  - **`RichTextEditor`(Tiptap) は `ssr:false` 必須**（`immediatelyRender:false` + browser API 依存）は変わらず。
 - `/history` は実測 **89 リクエスト中 50 が `/diary/*` の RSC プリフェッチ**（`?_rsc=`）。`DiaryCalendar` の全セル `<Link>` を App Router 既定の viewport プリフェッチが一斉発火させ、各々が動的ルート(sin1 関数+DB)を叩いていた。
   - **対策**: 日付セルだけ `components/diary/CalendarDayLink.tsx`（`prefetch={active ? null : false}` の hover/touch プリフェッチ）に置換。月送り等のナビ `<Link>` は据え置き。
 - **`loading.tsx` は入れない**（`#33` で全ルートに追加したが `#36` で撤去）。サーバー応答が warm ~270ms と速いと、遷移のたびにスケルトンが「出てすぐ消える＝点滅」になり**チラつき**として体感される（実測: `/`→`/history` 遷移で `animate-pulse` が47個一斉表示）。`loading.tsx` 不在なら App Router は**遷移中は現在のページを表示したまま**、新ページ準備後に差し替えるのでチラつかない。cold（~780ms）時の無反応が気になるなら、全画面スケルトンではなく上部の細いプログレスバー等の控えめな手段を検討する。
@@ -83,7 +84,7 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 - 429 catch 時は「1分ほど待ってから再試行」のメッセージを返す（`lib/actions/insight.ts` の `isRateLimitError`）。
 
 ## Tiptap（日記エディタ）
-- 入力 UI は Tiptap v3（`@tiptap/react` + `@tiptap/starter-kit` + 公式 `@tiptap/markdown`）。保存は従来通り Markdown 文字列で、表示は `react-markdown` のまま。
+- 入力 UI は Tiptap v3（`@tiptap/react` + `@tiptap/starter-kit` + 公式 `@tiptap/markdown`）。保存は従来通り Markdown 文字列。表示も同じ WYSIWYG（ひとひ刷新でプレビュータブと react-markdown は廃止）。
 - `@tiptap/core` / `@tiptap/pm` / `@tiptap/react` / `@tiptap/starter-kit` / `@tiptap/markdown` / `@tiptap/extensions` は **peer が exact pin**。6 つは常に同一バージョンに揃える。Dependabot 更新時もまとめて上げる（1 つだけ上がると実行時エラー）。
 - `useEditor` には必ず `immediatelyRender: false`（App Router の SSR エラー回避）。
 - エディタ設定は `lib/editor/diary-extensions.ts` に集約。見出しは H2/H3 のみ。
@@ -96,14 +97,14 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 - `app/globals.css` の at-rule 順序: **`@import` 系を全部先に、`@plugin` 系を後ろに**。Biome の `noInvalidPositionAtImportRule` で hatching し、CSS 仕様にも合致する。
 
 ## フォント（next/font + 日本語/CJK）
-- **現行構成（PR #45/#46 で刷新）**：本文・UI＝**端末標準ゴシックのシステムフォントスタック**（Webフォント不使用・転送ゼロ）、見出し＝**Noto Serif JP のみ self-host**（唯一の Webフォント・明朝・可変）。Geist Mono／Zen Kaku Gothic New／Shippori Mincho B1／Noto Sans JP の self-host は**退役済み**。定義は `app/layout.tsx`（next/font は Noto Serif JP 1本だけ）と `app/globals.css`（`--font-sans` / `--font-heading` / `--font-mono`）。
+- **現行構成（2026-07 ひとひ刷新）**：本文・UI・見出しすべて**端末標準ゴシックのシステムフォントスタック**（**Webフォント0本**・転送ゼロ）。明朝 Noto Serif JP（PR #45/#46 で唯一残していた self-host）も退役し、`app/layout.tsx` から next/font は消えた。定義は `app/globals.css`（`--font-sans` / `--font-heading` / `--font-mono`。`--font-heading` は sans と同一リテラル＋base で `h1..h3 { font-weight:600; letter-spacing:.03em }`）。
 - **なぜシステムフォントか**：有名な日本語Webアプリの本文はほぼ全て端末標準スタック（note・はてな・Qiita・Yahoo! JAPAN・Amazon JP）。巨大な CJK Webフォントを本文に self-host しないのが業界標準。明朝（セリフ）は本文全面でなく**見出し等の局所アクセント**として1本だけ Webフォント化するのが現実解（Zenn も明朝だけ Noto Serif JP を self-host。Android にセリフ既定が無く、明朝を端末任せにすると Android でゴシックに化けるため）。デジタル庁デザインシステムが本文に Noto Sans JP を採る理由も装飾でなく「全端末統一＋OFL」。メルカリ Mercari Sans 等のブランド書体はロゴ/見出し専用で本文UIには使わない（個人入手も不可）。
 - **`--font-sans`（本文）は OS ごとに和文書体を名指しする**：`-apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, "Noto Sans JP", sans-serif`。**`system-ui` 一語と裸の `游ゴシック` は避ける**（`system-ui` は Windows で細い `Yu Gothic UI` を呼び長文可読性が落ちる／裸の `Yu Gothic` は Windows でかすれ・太字崩れ。`Yu Gothic Medium` を名指しし Meiryo を後ろに置く）。末尾の `"Noto Sans JP"` は素の名前指定で Android のローカル Noto に当てるだけ（self-host ではない）。
-- **見出し `--font-heading` は明朝で揃える**：`var(--font-noto-serif-jp), "Hiragino Mincho ProN", "Yu Mincho", YuMincho, serif`。フォールバックも明朝に保ち未ロード時に角ゴ化させない。`@layer base` で `h1,h2,h3` に `font-weight: 500` を与え墨の存在感＋dark の痩せ対策（`font-bold`/`font-semibold` を当てた見出しはユーティリティ層が優先される）。`.prose :is(h1,h2,h3)` も `--font-heading`。
+- **明朝を再導入する場合の学び（退役済みだが記録）**：見出しだけ明朝にするならフォールバックも明朝で揃える（`"Hiragino Mincho ProN", "Yu Mincho", serif`）。Android にセリフ既定が無いため端末任せはゴシックに化ける。`font-bold`/`font-semibold` を当てた見出しは base よりユーティリティ層が優先される点も同じ。
 - **本文の太字はシステムのネイティブ太字**：システムゴシックは全ウェイトを持つので Markdown の `**強調**`（`font-bold`）が weight をロードせず効く。`--font-mono` もシステム等幅（`ui-monospace, …`）。**新たに和文 Webフォントを self-host で足さない**こと（本文をWebフォント化すると warm ~270ms の転送ゼロが崩れる）。
-- **読み物本文の寸法は一元化済み（PR #46）**：読書面は 16px / `line-height: 1.9`（`.prose p`）/ **和文への正トラッキングなし**。編集（Tiptap）もプレビュー（`.prose`）も 16px に揃え、`EnneagramHero` rationale も本文寸法。和文に latin 的な正の `letter-spacing` を盛らない（間延びするため。`/dev/design` のサンプルも合わせ済み）。
-- **`@theme inline` の自己参照に注意**：`--font-sans: var(--font-sans)` のような自己参照は何も当たらずブラウザ既定へフォールバックする（shadcn 雛形由来。`5132e10` で混入し `#29` で修正）。現行は `--font-sans` がシステムスタックの**リテラル**、`--font-heading` が **next/font の変数**（`var(--font-noto-serif-jp)`）を指す形。
-- **next/font × CJK の罠**：`subsets` に **`'japanese'` は存在しない**（subset 一覧は `cyrillic / latin / latin-ext / vietnamese` のみ）。`subsets` は「どの subset を **preload** するか」のフラグに過ぎず、**日本語グリフは subsets と無関係に全 `@font-face` が self-host され `unicode-range` で遅延ロード**される。よって Noto Serif JP は `subsets: ['latin']` + `preload: false` でよい（可変対応なので `weight` 指定も不要）。CJK は巨大なので **preload しない**。
+- **読み物本文の寸法（ひとひ）**：日記本文は 15px / `line-height: 2.05`（`.prose p` ＋ エディタの `text-[15px]`）/ **和文への正トラッキングなし**（見出しの `.03em` は例外）。和文に latin 的な正の `letter-spacing` を盛らない（間延びするため）。
+- **`@theme inline` の自己参照に注意**：`--font-sans: var(--font-sans)` のような自己参照は何も当たらずブラウザ既定へフォールバックする（shadcn 雛形由来。`5132e10` で混入し `#29` で修正）。現行は `--font-sans` も `--font-heading` もシステムスタックの**リテラル**（heading に sans を参照させたくなっても `var(--font-sans)` とは書けない）。
+- **next/font × CJK の罠（Webフォントを再導入する場合）**：`subsets` に **`'japanese'` は存在しない**（subset 一覧は `cyrillic / latin / latin-ext / vietnamese` のみ）。`subsets` は「どの subset を **preload** するか」のフラグに過ぎず、**日本語グリフは subsets と無関係に全 `@font-face` が self-host され `unicode-range` で遅延ロード**される。可変フォントなら `weight` 指定も不要。CJK は巨大なので **preload しない**。
 
 ## Biome のスタイルポリシー
 - `biome.json` で `quoteStyle: 'single'`、`jsxQuoteStyle: 'double'`。

@@ -32,6 +32,23 @@ export async function listDiaryEntries(): Promise<DiaryEntry[]> {
     .orderBy(desc(diaryEntries.entryDate));
 }
 
+// /history の「さいきんの日記」用。抜粋と字数の算出に本文も使うが、件数を絞って取る。
+export async function listRecentEntries(
+  limit: number,
+): Promise<Pick<DiaryEntry, 'entryDate' | 'content'>[]> {
+  const session = await requireSession();
+  const userId = session.user.id;
+  return db
+    .select({
+      entryDate: diaryEntries.entryDate,
+      content: diaryEntries.content,
+    })
+    .from(diaryEntries)
+    .where(eq(diaryEntries.userId, userId))
+    .orderBy(desc(diaryEntries.entryDate))
+    .limit(limit);
+}
+
 // /history 用の軽量クエリ。カレンダーは entryDate しか使わないので content を含む
 // 全カラムを取らず、日付だけを取得する（行数が増えても転送が日付列に固定される）。
 export async function listEntryDates(): Promise<string[]> {

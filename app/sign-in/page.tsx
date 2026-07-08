@@ -2,7 +2,9 @@
 
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
-import { Button } from '@/components/ui/button';
+import { SunDot } from '@/components/icons/SunDot';
+import { BrandMark } from '@/components/layout/BrandMark';
+import { GoogleLogo } from '@/components/ui/google-logo';
 import { signIn } from '@/lib/auth/client';
 
 function SignInContent() {
@@ -17,25 +19,51 @@ function SignInContent() {
   };
 
   return (
-    <main className="container mx-auto flex max-w-md flex-col items-center gap-6 p-6 pt-24">
-      <h1 className="text-2xl font-bold">サインイン</h1>
-      <p className="text-sm text-muted-foreground">
-        Google アカウントでサインインしてください
-      </p>
-      <Button type="button" onClick={handleGoogle} className="w-full">
-        Google でサインイン
-      </Button>
-      {error === 'not_allowed' && (
-        <p className="text-sm text-destructive">
-          このメールアドレスはサインインを許可されていません。
-        </p>
-      )}
-      {error && error !== 'not_allowed' && (
-        <p className="text-sm text-destructive">
-          サインインに失敗しました（{error}）。
-        </p>
-      )}
-    </main>
+    <>
+      {/* サインインは罫なしのロゴのみヘッダ（アプリのヘッダは /sign-in では出ない） */}
+      <div className="mx-auto flex w-full max-w-[1120px] items-center px-6 py-[15px] lg:px-10">
+        <BrandMark />
+      </div>
+      <main className="flex flex-1 items-center justify-center px-6 pt-6 pb-20">
+        <div className="flex w-full max-w-[400px] flex-col items-center text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-streak-soft px-3 py-1">
+            <SunDot className="size-3 text-streak" />
+            <span className="text-[11.5px] font-semibold text-streak">
+              1日の終わりに、3分だけ
+            </span>
+          </span>
+          <h1 className="mt-[18px] text-[26px] leading-[1.6]">
+            きょうの「ひとひ」を、
+            <br />
+            ひとことから。
+          </h1>
+          <p className="mt-3 text-[13px] leading-[1.9] text-muted-foreground">
+            書いた日記から、あなたの1週間の傾向もそっと教えてくれます。
+          </p>
+          <button
+            type="button"
+            onClick={handleGoogle}
+            className="mt-7 inline-flex w-full items-center justify-center gap-2.5 rounded-lg border bg-card px-5 py-3 text-[13.5px] font-semibold text-foreground shadow-card transition hover:border-primary/50"
+          >
+            <GoogleLogo className="size-4" />
+            Google でサインイン
+          </button>
+          <p className="mt-3.5 text-[11px] text-muted-foreground">
+            日記はあなたのアカウントにだけ保存されます。
+          </p>
+          {error === 'not_allowed' && (
+            <p className="mt-4 text-sm text-destructive">
+              このメールアドレスはサインインを許可されていません。
+            </p>
+          )}
+          {error && error !== 'not_allowed' && (
+            <p className="mt-4 text-sm text-destructive">
+              サインインに失敗しました（{error}）。
+            </p>
+          )}
+        </div>
+      </main>
+    </>
   );
 }
 

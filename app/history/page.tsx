@@ -1,14 +1,28 @@
 // app/history/page.tsx
 
 import { DiaryCalendar } from '@/components/diary/DiaryCalendar';
+import { RecentEntries } from '@/components/diary/RecentEntries';
 import { RecordStats } from '@/components/diary/RecordStats';
 import {
+  addDays,
   formatYearMonth,
   parseYearMonth,
   todayInTokyo,
 } from '@/lib/calendar/month-grid';
-import { listEntryDates } from '@/lib/db/queries/diary';
+import { listEntryDates, listRecentEntries } from '@/lib/db/queries/diary';
 import { computeLongestStreak, computeStreak } from '@/lib/diary/streak';
+
+const RECENT_LIMIT = 5;
+
+// 一覧に出す直近エントリ同士の間で、最初に欠けた日を1つ返す（さかのぼり導線）。
+function findRecentGap(dates: readonly string[]): string | null {
+  const span = Math.min(dates.length - 1, RECENT_LIMIT - 1);
+  for (let i = 0; i < span; i++) {
+    const expected = addDays(dates[i], -1);
+    if (dates[i + 1] !== expected) return expected;
+  }
+  return null;
+}
 
 interface PageProps {
   searchParams: Promise<{ ym?: string }>;
@@ -26,18 +40,23 @@ export default async function HistoryPage({ searchParams }: PageProps) {
   const year = requested?.year ?? currentYear;
   const month = requested?.month ?? currentMonth;
 
-  const dates = await listEntryDates();
+  const [dates, recent] = await Promise.all([
+    listEntryDates(),
+    listRecentEntries(RECENT_LIMIT),
+  ]);
   const writtenDates = new Set(dates);
   const current = computeStreak(dates, today);
   const longest = computeLongestStreak(dates);
   const total = dates.length;
 
   return (
-    <main className="container mx-auto max-w-3xl p-6">
-      <h1 className="mb-4 text-2xl font-bold">日記の履歴</h1>
-      {/* カレンダーは本文幅（max-w-3xl）いっぱいに広げ、見出し・ヘッダーと左端を揃える。 */}
-      <div>
+    <main className="mx-auto w-full max-w-[1120px] flex-1 px-6 pt-10 pb-20 lg:px-10">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <h1 className="text-[21px]">これまで</h1>
         <RecordStats current={current} longest={longest} total={total} />
+      </div>
+
+      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[352px_1fr]">
         <DiaryCalendar
           year={year}
           month={month}
@@ -45,9 +64,11 @@ export default async function HistoryPage({ searchParams }: PageProps) {
           writtenDates={writtenDates}
           currentYearMonth={formatYearMonth(currentYear, currentMonth)}
         />
-        {dates.length === 0 && (
-          <p className="mt-6 text-sm text-muted-foreground">
-            まだ日記がありません。トップから書いてみましょう。
+        {total > 0 ? (
+          <RecentEntries entries={recent} gapDate={findRecentGap(dates)} />
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            まだ日記がありません。「今日」から書いてみましょう。
           </p>
         )}
       </div>

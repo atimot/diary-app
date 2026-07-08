@@ -1,5 +1,5 @@
-import { Flame } from 'lucide-react';
 import type { ReactElement } from 'react';
+import { SunDot } from '@/components/icons/SunDot';
 
 interface RecordStatsProps {
   current: number;
@@ -7,9 +7,8 @@ interface RecordStatsProps {
   total: number;
 }
 
-// カレンダー上部の「積み重ね指標」帯。
-// 現在連続のみ若葉(--primary)で「育っている今」を強調し、最長・通算は墨。
-// 深度は下罫＋明度差のみ（影なし）。total<=0（新規ユーザー）では帯を出さない。
+// 「これまで」見出し右に並ぶ積み重ね指標。連続だけアンバー（--streak）のラベルで
+// 「続いている今」を示し、最長・通算は無彩ラベル。total<=0（新規ユーザー）では出さない。
 export function RecordStats({
   current,
   longest,
@@ -18,48 +17,31 @@ export function RecordStats({
   if (total <= 0) return null;
 
   return (
-    <div className="mb-6 flex flex-wrap items-end gap-x-8 gap-y-3 border-b border-border pb-4">
-      <div className="flex flex-col gap-1">
-        <span className="text-xs text-muted-foreground">連続記録</span>
-        <span className="inline-flex items-baseline gap-1.5">
-          {current > 0 && (
-            <Flame
-              className="size-4 self-center text-primary"
-              aria-hidden="true"
-            />
-          )}
-          <span
-            className={`font-heading text-3xl leading-none tabular-nums ${
-              current > 0 ? 'text-primary' : 'text-foreground'
-            }`}
-          >
-            {current}
-          </span>
-          <span className="text-sm text-muted-foreground">日</span>
+    <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2 sm:gap-x-[26px]">
+      <span className="inline-flex items-baseline gap-1.5">
+        <span className="inline-flex items-center gap-1 text-[11.5px] text-streak">
+          <SunDot className="size-[11px]" />
+          連続
         </span>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <span className="text-xs text-muted-foreground">
-          最長（自己ベスト）
+        <span className="text-xl font-semibold leading-none tabular-nums">
+          {current}
         </span>
-        <span className="inline-flex items-baseline gap-1.5">
-          <span className="font-heading text-3xl leading-none tabular-nums text-foreground">
-            {longest}
-          </span>
-          <span className="text-sm text-muted-foreground">日</span>
+        <span className="text-[11.5px] text-muted-foreground">日</span>
+      </span>
+      <span className="inline-flex items-baseline gap-1.5">
+        <span className="text-[11.5px] text-muted-foreground">最長</span>
+        <span className="text-xl font-semibold leading-none tabular-nums">
+          {longest}
         </span>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <span className="text-xs text-muted-foreground">通算記録</span>
-        <span className="inline-flex items-baseline gap-1.5">
-          <span className="font-heading text-3xl leading-none tabular-nums text-foreground">
-            {total}
-          </span>
-          <span className="text-sm text-muted-foreground">日</span>
+        <span className="text-[11.5px] text-muted-foreground">日</span>
+      </span>
+      <span className="inline-flex items-baseline gap-1.5">
+        <span className="text-[11.5px] text-muted-foreground">通算</span>
+        <span className="text-xl font-semibold leading-none tabular-nums">
+          {total}
         </span>
-      </div>
+        <span className="text-[11.5px] text-muted-foreground">日</span>
+      </span>
     </div>
   );
 }
