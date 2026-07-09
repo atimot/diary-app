@@ -2,10 +2,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { unstable_rethrow } from 'next/navigation';
 import { generateCombinedInsight } from '@/lib/ai/combined-insight';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@/lib/db/client';
-import { listDiaryEntries } from '@/lib/db/queries/diary';
+import { listRecentEntries } from '@/lib/db/queries/diary';
 import { enneagramSnapshots, weeklyInsights } from '@/lib/db/schema';
 
 const MIN_ENTRIES = 7;
@@ -22,20 +23,21 @@ function isRateLimitError(err: unknown): boolean {
 }
 
 export async function regenerateInsight(): Promise<RegenerateResult> {
-  try {
-    const session = await requireSession();
-    const userId = session.user.id;
+  // 未認証時の redirect() の throw を下の汎用 catch に飲ませないため、try の外で呼ぶ
+  const session = await requireSession();
+  const userId = session.user.id;
 
-    const allEntries = await listDiaryEntries();
-    if (allEntries.length < MIN_ENTRIES) {
+  try {
+    // entryDate DESC + limit なので、返るのは最新の MIN_ENTRIES 件
+    // （limit 未満しか返らなければ、それが実件数）
+    const recent = await listRecentEntries(MIN_ENTRIES);
+    if (recent.length < MIN_ENTRIES) {
       return {
         ok: false,
-        error: `日記が${MIN_ENTRIES}件以上必要です（現在${allEntries.length}件）`,
+        error: `日記が${MIN_ENTRIES}件以上必要です（現在${recent.length}件）`,
       };
     }
 
-    // listDiaryEntries は entryDate DESC なので、最初の7件が最新7件
-    const recent = allEntries.slice(0, MIN_ENTRIES);
     const dates = recent.map((e) => e.entryDate).sort();
     const periodStart = dates[0];
     const periodEnd = dates[dates.length - 1];
@@ -95,6 +97,9 @@ export async function regenerateInsight(): Promise<RegenerateResult> {
     revalidatePath('/insights');
     return { ok: true };
   } catch (err) {
+    // try 内のクエリ経由で requireSession の redirect() が throw され得る。
+    // NEXT_REDIRECT 等の内部エラーは握りつぶさず再スロー（Next 公式パターン）
+    unstable_rethrow(err);
     console.error('Failed to regenerate insight:', err);
     if (isRateLimitError(err)) {
       return {

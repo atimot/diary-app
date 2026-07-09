@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { signOut, useSession } from '@/lib/auth/client';
+import { signOut } from '@/lib/auth/client';
 
 const links = [
   {
@@ -33,10 +33,17 @@ const links = [
   },
 ];
 
-export function HeaderNav() {
+export function HeaderNav({
+  // セッションはサーバー（layout の getSessionOrNull）から渡す。
+  // クライアントの useSession() だと毎ページ /api/auth/get-session を fetch してしまう。
+  // トレードオフ: サーバーレンダー時点のスナップショットなので、別タブで signOut
+  // しても放置中のタブは次のハードナビまで表示が古いまま（単一ユーザー運用で許容）
+  user,
+}: {
+  user: { name: string; email: string } | null;
+}) {
   const pathname = usePathname();
   const router = useRouter();
-  const { data: session } = useSession();
 
   if (pathname.startsWith('/sign-in')) return null;
 
@@ -44,9 +51,6 @@ export function HeaderNav() {
     await signOut();
     router.push('/sign-in');
   };
-
-  const user = session?.user;
-  const initial = user?.name?.trim().charAt(0) || 'あ';
 
   return (
     <header className="border-b">
@@ -97,7 +101,7 @@ export function HeaderNav() {
                     />
                   }
                 >
-                  {initial}
+                  {user.name.trim().charAt(0) || 'あ'}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuLabel>{user.email}</DropdownMenuLabel>

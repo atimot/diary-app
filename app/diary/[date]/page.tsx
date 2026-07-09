@@ -2,10 +2,9 @@
 import { notFound } from 'next/navigation';
 import { DiaryDateHeader } from '@/components/diary/DiaryDateHeader';
 import { DiaryEditor } from '@/components/diary/DiaryEditor';
-import { todayInTokyo } from '@/lib/calendar/month-grid';
+import { isRealDate, todayInTokyo } from '@/lib/calendar/month-grid';
 import { getDiaryEntry } from '@/lib/db/queries/diary';
-
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+import { FOCUS_CONTAINER } from '@/lib/design/containers';
 
 interface PageProps {
   params: Promise<{ date: string }>;
@@ -13,7 +12,10 @@ interface PageProps {
 
 export default async function DiaryDetailPage({ params }: PageProps) {
   const { date } = await params;
-  if (!DATE_PATTERN.test(date)) {
+
+  // isRealDate は parse→format の往復一致判定なので、形式不正（'foo' 等）も
+  // 実在しない暦日（2025-02-30 等）もこれ一発で弾ける（Postgres に渡す前に 404）
+  if (!isRealDate(date)) {
     notFound();
   }
 
@@ -25,7 +27,7 @@ export default async function DiaryDetailPage({ params }: PageProps) {
   const entry = await getDiaryEntry(date);
 
   return (
-    <main className="mx-auto w-full max-w-[680px] flex-1 px-4 pt-6 pb-11 md:px-6 md:pt-11 md:pb-20">
+    <main className={FOCUS_CONTAINER}>
       <DiaryDateHeader date={date} />
       <DiaryEditor entryDate={date} initialContent={entry?.content ?? ''} />
     </main>

@@ -8,7 +8,7 @@ const PROTECTED_PATTERNS = [
   /^\/insights(\/|$)/,
 ];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 素通し: /sign-in, /api/auth/*, 静的アセット

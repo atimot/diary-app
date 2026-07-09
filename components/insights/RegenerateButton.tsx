@@ -23,6 +23,8 @@ export function RegenerateButton({
     setErrorMessage(null);
     startTransition(async () => {
       const result = await regenerateInsight();
+      // セッション失効時は redirect（NEXT_REDIRECT）で遷移し、値は返らない
+      if (!result) return;
       if (!result.ok) {
         setErrorMessage(result.error);
       }

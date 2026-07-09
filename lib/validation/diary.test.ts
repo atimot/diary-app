@@ -18,6 +18,22 @@ describe('diaryEntrySchema', () => {
     expect(result.success).toBe(false);
   });
 
+  it('rejects a non-existent calendar date', () => {
+    const result = diaryEntrySchema.safeParse({
+      entryDate: '2025-02-30',
+      content: 'Hello',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts a leap-year Feb 29', () => {
+    const result = diaryEntrySchema.safeParse({
+      entryDate: '2024-02-29',
+      content: 'Hello',
+    });
+    expect(result.success).toBe(true);
+  });
+
   it('rejects empty content', () => {
     const result = diaryEntrySchema.safeParse({
       entryDate: '2026-06-10',

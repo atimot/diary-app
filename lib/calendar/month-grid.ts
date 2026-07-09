@@ -35,6 +35,12 @@ export function addDays(yyyymmdd: string, days: number): string {
   return formatYMD(d);
 }
 
+// 実在する暦日かを判定する。Date.UTC は 2025-02-30 → 2025-03-02 のように
+// 正規化するため、parse→format の往復で元の文字列に戻るかで弾ける。
+export function isRealDate(yyyymmdd: string): boolean {
+  return addDays(yyyymmdd, 0) === yyyymmdd;
+}
+
 export function todayInTokyo(): string {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Tokyo' });
 }

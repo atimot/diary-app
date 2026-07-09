@@ -60,6 +60,8 @@ export function DiaryEditor({
   const handleAction = (formData: FormData) => {
     startSaveTransition(async () => {
       const result = await saveDiaryEntry(formData);
+      // セッション失効時は redirect（NEXT_REDIRECT）で遷移し、値は返らない
+      if (!result) return;
       if (result.ok) {
         setFeedback({ kind: 'success', message: '保存しました' });
         setCelebration(result.streak);
@@ -74,6 +76,7 @@ export function DiaryEditor({
   const handleDelete = () => {
     startDeleteTransition(async () => {
       const result = await deleteDiaryEntry(entryDate);
+      if (!result) return;
       if (result.ok) {
         router.push('/');
       } else {

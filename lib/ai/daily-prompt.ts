@@ -32,6 +32,9 @@ async function generatePrompt(date: string): Promise<string> {
 
 // 日付キーで1日1回だけ生成（Gemini 無料枠 5 RPM 対策）。
 // 同じ日付の再アクセスはキャッシュ命中で AI を叩かない。
+// NOTE: unstable_cache は Next.js 16 で 'use cache'（Cache Components）に置き換えられた API だが、
+// cacheComponents 有効化はアプリ全体のキャッシュ意味論を変えるため今は移行しない。
+// Cache Components 移行時に 'use cache' + cacheLife へ置換する（unstable_cache の使用はここ1箇所のみ）。
 function getDailyPromptCached(date: string): Promise<string> {
   return unstable_cache(() => generatePrompt(date), ['daily-prompt', date], {
     revalidate: 60 * 60 * 24,
