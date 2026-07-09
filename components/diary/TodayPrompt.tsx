@@ -10,6 +10,8 @@ interface TodayPromptProps {
 
 // 書き出しのきっかけチップ。Q チップを押すと別の問いに入れ替わり、
 // 「じぶんで書く」で今日はチップ行ごと畳む（再訪で復活する軽い状態）。
+// このチップ行の寸法クラス（mt/border/py/text）を変えるときは、
+// app/page.tsx の TodayPromptFallback も同じ縦占有に揃えること。
 export function TodayPrompt({ initialText, date }: TodayPromptProps) {
   const [text, setText] = useState(initialText);
   const [pending, startTransition] = useTransition();
@@ -20,6 +22,8 @@ export function TodayPrompt({ initialText, date }: TodayPromptProps) {
   const handleRenew = () => {
     startTransition(async () => {
       const res = await regenerateTodayPrompt(date);
+      // セッション失効時は redirect（NEXT_REDIRECT）で遷移し、値は返らない
+      if (!res) return;
       setText(res.text);
     });
   };

@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  centerBreakdown,
-  dominantType,
-  topTypes,
-  typeCode,
-  wing,
-} from './derive';
+import { dominantType, topTypes, typeCode, wing } from './derive';
 import {
   type EnneagramScores,
   type EnneagramTypeNumber,
@@ -105,24 +99,5 @@ describe('isEnneagramScores', () => {
   it('rejects null and non-objects', () => {
     expect(isEnneagramScores(null)).toBe(false);
     expect(isEnneagramScores(42)).toBe(false);
-  });
-});
-
-describe('centerBreakdown', () => {
-  it('groups scores into gut/heart/head and computes shares', () => {
-    const b = centerBreakdown(
-      scores({ 8: 0.2, 9: 0.8, 1: 0.5, 2: 0.6, 3: 0.4, 6: 0.5 }),
-    );
-    expect(b.centers.map((c) => c.center)).toEqual(['gut', 'heart', 'head']);
-    const gut = b.centers.find((c) => c.center === 'gut');
-    expect(gut?.total).toBeCloseTo(1.5);
-    expect(gut?.share).toBeCloseTo(0.5);
-    expect(b.dominant).toBe('gut');
-  });
-
-  it('returns zero shares and a deterministic dominant when all scores are zero', () => {
-    const b = centerBreakdown(scores({}));
-    expect(b.centers.every((c) => c.share === 0)).toBe(true);
-    expect(b.dominant).toBe('gut');
   });
 });

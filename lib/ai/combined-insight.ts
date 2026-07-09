@@ -16,7 +16,7 @@ export interface GenerateCombinedInsightResult {
 }
 
 export async function generateCombinedInsight(
-  entries: DiaryEntry[],
+  entries: Pick<DiaryEntry, 'entryDate' | 'content'>[],
 ): Promise<GenerateCombinedInsightResult> {
   if (entries.length < 7) {
     throw new Error(`Need at least 7 entries, got ${entries.length}`);

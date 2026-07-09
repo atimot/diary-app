@@ -10,6 +10,7 @@ import {
   todayInTokyo,
 } from '@/lib/calendar/month-grid';
 import { listEntryDates, listRecentEntries } from '@/lib/db/queries/diary';
+import { BOARD_CONTAINER } from '@/lib/design/containers';
 import { computeLongestStreak, computeStreak } from '@/lib/diary/streak';
 
 const RECENT_LIMIT = 5;
@@ -50,7 +51,7 @@ export default async function HistoryPage({ searchParams }: PageProps) {
   const total = dates.length;
 
   return (
-    <main className="mx-auto w-full max-w-[1120px] flex-1 px-4 pt-6 pb-11 md:px-6 md:pt-10 md:pb-20 lg:px-10">
+    <main className={BOARD_CONTAINER}>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h1 className="text-[19px] md:text-[21px]">これまで</h1>
         <RecordStats current={current} longest={longest} total={total} />

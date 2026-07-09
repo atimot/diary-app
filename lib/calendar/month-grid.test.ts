@@ -3,6 +3,7 @@ import {
   addDays,
   buildMonthGrid,
   formatYearMonth,
+  isRealDate,
   nextMonth,
   parseYearMonth,
   prevMonth,
@@ -75,6 +76,32 @@ describe('addDays', () => {
 
   it('crosses year boundary backward', () => {
     expect(addDays('2026-01-02', -3)).toBe('2025-12-30');
+  });
+});
+
+describe('isRealDate', () => {
+  it('accepts an ordinary real date', () => {
+    expect(isRealDate('2026-02-28')).toBe(true);
+  });
+
+  it('accepts Feb 29 on a leap year', () => {
+    expect(isRealDate('2024-02-29')).toBe(true);
+  });
+
+  it('rejects Feb 29 on a non-leap year', () => {
+    expect(isRealDate('2023-02-29')).toBe(false);
+  });
+
+  it('rejects a day that overflows the month', () => {
+    expect(isRealDate('2025-02-30')).toBe(false);
+  });
+
+  it('rejects month 00', () => {
+    expect(isRealDate('2026-00-10')).toBe(false);
+  });
+
+  it('rejects month 13', () => {
+    expect(isRealDate('2026-13-01')).toBe(false);
   });
 });
 

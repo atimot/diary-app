@@ -1,22 +1,6 @@
 // lib/diary/season.ts
-// 日付 → 和風月名・二十四節気・一言メモ（情緒の添え物）。
-// 新暦月をそのまま和風月名に対応させる単純版（旧暦換算はしない＝YAGNI、ズレ許容）。
+// 日付 → 二十四節気・一言メモ（情緒の添え物）。
 // 二十四節気は年で数日揺れるため近似の開始日テーブルで引く。
-
-const WAFU_MONTH = [
-  '睦月',
-  '如月',
-  '弥生',
-  '卯月',
-  '皐月',
-  '水無月',
-  '文月',
-  '葉月',
-  '長月',
-  '神無月',
-  '霜月',
-  '師走',
-];
 
 interface SekkiDef {
   md: number; // month*100 + day（近似の開始日）
@@ -53,7 +37,6 @@ const SEKKI: SekkiDef[] = [
 ];
 
 export interface Season {
-  wafuMonth: string;
   sekki: string;
   note: string;
 }
@@ -63,13 +46,12 @@ export function getSeason(date: string): Season {
   const month = Number(parts[1]);
   const day = Number(parts[2]);
   const key = month * 100 + day;
-  const wafuMonth = WAFU_MONTH[month - 1];
 
   // 1/1〜1/4 は小寒（105）より前 → 前年の冬至へ倒す。
   if (key < 105) {
     const touji = SEKKI.find((s) => s.name === '冬至');
     const note = touji ? touji.note : '';
-    return { wafuMonth, sekki: '冬至', note };
+    return { sekki: '冬至', note };
   }
 
   // key 以下で md が最大の節気を選ぶ（Jan の小さい md も自然に拾える）。
@@ -81,5 +63,5 @@ export function getSeason(date: string): Season {
       chosen = s;
     }
   }
-  return { wafuMonth, sekki: chosen.name, note: chosen.note };
+  return { sekki: chosen.name, note: chosen.note };
 }

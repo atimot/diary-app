@@ -4,4 +4,5 @@ export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL ?? '',
 });
 
-export const { signIn, signOut, useSession } = authClient;
+// useSession はヘッダーのサーバー props 化（layout の getSessionOrNull）で不要になった
+export const { signIn, signOut } = authClient;

@@ -33,12 +33,6 @@ export function isEnneagramScores(value: unknown): value is EnneagramScores {
   );
 }
 
-export const CENTER_LABELS: Record<EnneagramCenter, string> = {
-  gut: '本能（腹）',
-  heart: '感情（心）',
-  head: '思考（頭）',
-};
-
 // チップや凡例で使う短縮ラベル（「感情タイプ」「●感情」など）。
 export const CENTER_SHORT_LABELS: Record<EnneagramCenter, string> = {
   gut: '本能',
@@ -54,14 +48,7 @@ export const CENTER_COLOR_VARS: Record<EnneagramCenter, string> = {
   head: 'var(--center-head)',
 };
 
-// 円周上の3センター。腹=8,9,1 / 心=2,3,4 / 頭=5,6,7。
-export const CENTER_MEMBERS: Record<EnneagramCenter, EnneagramTypeNumber[]> = {
-  gut: [8, 9, 1],
-  heart: [2, 3, 4],
-  head: [5, 6, 7],
-};
-
-// dominant 判定のタイブレーク等で使う、安定したセンター順。
+// 凡例（EnneagramTrends）の表示順に使う、安定したセンター順。
 export const CENTER_ORDER: EnneagramCenter[] = ['gut', 'heart', 'head'];
 
 export const ENNEAGRAM_TYPES: Record<EnneagramTypeNumber, EnneagramType> = {

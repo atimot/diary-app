@@ -3,6 +3,7 @@
 
 import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import { unstable_rethrow } from 'next/navigation';
 import { requireSession } from '@/lib/auth/session';
 import { todayInTokyo } from '@/lib/calendar/month-grid';
 import { db } from '@/lib/db/client';
@@ -57,6 +58,9 @@ export async function saveDiaryEntry(formData: FormData): Promise<SaveResult> {
 
     return { ok: true, streak };
   } catch (err) {
+    // try 内の listEntryDates → requireSession が redirect() を throw し得る。
+    // NEXT_REDIRECT 等の内部エラーは握りつぶさず再スロー（Next 公式パターン）
+    unstable_rethrow(err);
     console.error('Failed to save diary entry:', err);
     return { ok: false, error: '保存に失敗しました' };
   }
@@ -90,6 +94,7 @@ export async function deleteDiaryEntry(
 
     return { ok: true };
   } catch (err) {
+    unstable_rethrow(err);
     console.error('Failed to delete diary entry:', err);
     return { ok: false, error: '削除に失敗しました' };
   }

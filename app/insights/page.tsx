@@ -4,11 +4,9 @@ import { RegenerateButton } from '@/components/insights/RegenerateButton';
 import { countDiaryEntries } from '@/lib/db/queries/diary';
 import { getLatestEnneagramSnapshot } from '@/lib/db/queries/enneagram';
 import { getLatestInsight } from '@/lib/db/queries/insight';
+import { BOARD_CONTAINER } from '@/lib/design/containers';
 
 const MIN_ENTRIES = 7;
-
-const MAIN_CLASS =
-  'mx-auto w-full max-w-[1120px] flex-1 px-4 pt-6 pb-11 md:px-6 md:pt-10 md:pb-20 lg:px-10';
 
 function formatDateTime(value: Date): string {
   return new Intl.DateTimeFormat('ja-JP', {
@@ -38,7 +36,7 @@ export default async function InsightsPage() {
   if (entryCount < MIN_ENTRIES) {
     const remaining = MIN_ENTRIES - entryCount;
     return (
-      <main className={MAIN_CLASS}>
+      <main className={BOARD_CONTAINER}>
         <h1 className="text-[19px] md:text-[21px]">気づき</h1>
         <p className="mt-4 text-sm text-muted-foreground">
           AI 分析を見るには日記が {MIN_ENTRIES} 件必要です。あと {remaining}{' '}
@@ -51,7 +49,7 @@ export default async function InsightsPage() {
   // state 2: 件数は足りているが、insight も enneagram もまだ生成していない
   if (!insight && !enneagram) {
     return (
-      <main className={MAIN_CLASS}>
+      <main className={BOARD_CONTAINER}>
         <h1 className="text-[19px] md:text-[21px]">気づき</h1>
         <p className="mt-4 mb-4 text-sm text-muted-foreground">
           日記が {entryCount} 件溜まりました。AI
@@ -68,7 +66,7 @@ export default async function InsightsPage() {
 
   // state 3: 少なくとも片方のキャッシュあり
   return (
-    <main className={MAIN_CLASS}>
+    <main className={BOARD_CONTAINER}>
       {/* SP は h1 とボタンが同じ行（items-start）、md 以上は左ブロック下端に揃える */}
       <div className="flex flex-wrap items-start justify-between gap-3 md:items-end">
         <div>

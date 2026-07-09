@@ -1,22 +1,15 @@
-'use client';
-
-import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 import { SunDot } from '@/components/icons/SunDot';
 import { BrandMark } from '@/components/layout/BrandMark';
-import { GoogleLogo } from '@/components/ui/google-logo';
-import { signIn } from '@/lib/auth/client';
 
-function SignInContent() {
-  const params = useSearchParams();
-  const error = params.get('error');
+interface PageProps {
+  searchParams: Promise<{ error?: string | string[] }>;
+}
 
-  const handleGoogle = () => {
-    signIn.social({
-      provider: 'google',
-      callbackURL: '/',
-    });
-  };
+export default async function SignInPage({ searchParams }: PageProps) {
+  const rawError = (await searchParams).error;
+  // 同名パラメータが重複した場合は配列になるので先頭値に正規化
+  const error = Array.isArray(rawError) ? rawError[0] : rawError;
 
   return (
     <>
@@ -40,23 +33,18 @@ function SignInContent() {
           <p className="mt-2.5 text-[12.5px] leading-[1.9] text-muted-foreground md:mt-3 md:text-[13px]">
             書いた日記から、あなたの1週間の傾向もそっと教えてくれます。
           </p>
-          <button
-            type="button"
-            onClick={handleGoogle}
-            className="mt-[26px] inline-flex w-full items-center justify-center gap-2.5 rounded-lg border bg-card px-5 py-[13px] text-[13.5px] font-semibold text-foreground shadow-card transition hover:border-primary/50 md:mt-7 md:py-3"
-          >
-            <GoogleLogo className="size-4" />
-            Google でサインイン
-          </button>
+          <GoogleSignInButton />
           <p className="mt-3 text-[11px] text-muted-foreground md:mt-3.5">
             日記はあなたのアカウントにだけ保存されます。
           </p>
-          {error === 'not_allowed' && (
+          {/* databaseHooks の throw Error('NOT_ALLOWED') は Better Auth が
+              unable_to_create_user に包んで返す（AGENTS.md 参照） */}
+          {error === 'unable_to_create_user' && (
             <p className="mt-4 text-sm text-destructive">
               このメールアドレスはサインインを許可されていません。
             </p>
           )}
-          {error && error !== 'not_allowed' && (
+          {error && error !== 'unable_to_create_user' && (
             <p className="mt-4 text-sm text-destructive">
               サインインに失敗しました（{error}）。
             </p>
@@ -64,13 +52,5 @@ function SignInContent() {
         </div>
       </main>
     </>
-  );
-}
-
-export default function SignInPage() {
-  return (
-    <Suspense fallback={null}>
-      <SignInContent />
-    </Suspense>
   );
 }

@@ -22,24 +22,17 @@ export async function getDiaryEntry(
   return rows[0];
 }
 
-export async function listDiaryEntries(): Promise<DiaryEntry[]> {
-  const session = await requireSession();
-  const userId = session.user.id;
-  return db
-    .select()
-    .from(diaryEntries)
-    .where(eq(diaryEntries.userId, userId))
-    .orderBy(desc(diaryEntries.entryDate));
-}
-
-// /history の「さいきんの日記」用。抜粋と字数の算出に本文も使うが、件数を絞って取る。
+// 最新 limit 件（entryDate DESC）。/history の「さいきんの日記」と
+// /insights の再分析（AI に渡す本文）の両方で使う。
+// 全件・全カラムではなく、使う id / entryDate / content に絞って取る。
 export async function listRecentEntries(
   limit: number,
-): Promise<Pick<DiaryEntry, 'entryDate' | 'content'>[]> {
+): Promise<Pick<DiaryEntry, 'id' | 'entryDate' | 'content'>[]> {
   const session = await requireSession();
   const userId = session.user.id;
   return db
     .select({
+      id: diaryEntries.id,
       entryDate: diaryEntries.entryDate,
       content: diaryEntries.content,
     })
