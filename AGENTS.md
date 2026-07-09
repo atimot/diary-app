@@ -13,7 +13,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 2. 書体は**全てゴシック（端末標準のシステムフォントスタック・Webフォント0本）**。見出しも `font-heading`（=ゴシック、base で weight 600・字間 .03em）。明朝 Noto Serif JP は退役済み — **和文 Webフォントを新たに足さない**。**11px未満禁止**（カンプの 10〜10.5px 指定は 11px に丸める）。
 3. アクセントの役割分担: 青（`--primary`）はナビ active・主ボタン・カードラベル・書いた日など画面の主役（乱用しない）。アンバー（`--streak` / 面は `--streak-soft`）は**継続と「今日」だけ**（つづきピル・今日リング・カレンダー曜日ヘッダの日曜）。テラコッタ（`--season`）は**リスト中の日曜表示だけ**。危険操作は `--destructive`。
 4. 深度は**罫＋明度差＋light のみの淡い影トークン**（`shadow-card` = `--card-shadow`、ダークでは無効）。それ以外の drop-shadow 追加禁止（focus ring 等の機能的影は可）。
-5. コンテナは2段階: **集中幅 680px**（今日・個別日記・サインイン）と**ボード幅 max-w-[1120px]+px-10**（これまで・気づき、ヘッダーと同じ罫に揃う）。
+5. コンテナは2段階: **集中幅 680px**（今日・個別日記）と**ボード幅 max-w-[1120px]+px-10**（これまで・気づき、ヘッダーと同じ罫に揃う）。サインインは例外（ロゴ行は 1120px、本文は `max-w-[400px]` のセンターカードで 680px を使わない）。
 6. **SP（md未満）はカンプ §5 準拠**: ヘッダーは2段（ロゴ行＋**3タブ均等ナビ**、アクティブ下線は `inset-x-[32%]`）／ボード画面は1カラム縦積み／**タップ目標44px**（カレンダーセル h-11・ツールバー size-8）／SPでは字数列・カレンダー凡例・⌘⏎ヒントを省略し、エディタの字数はカード外右下へ。余白は px-4・pt-6・pb-11 が基準。
 7. 新パターン追加前に `/dev/design` と既存部品を確認し**再利用優先**。**ダーク対応必須**（両モードで成立させる）。
 
@@ -56,7 +56,7 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 - `/history` は実測 **89 リクエスト中 50 が `/diary/*` の RSC プリフェッチ**（`?_rsc=`）。`DiaryCalendar` の全セル `<Link>` を App Router 既定の viewport プリフェッチが一斉発火させ、各々が動的ルート(sin1 関数+DB)を叩いていた。
   - **対策**: 日付セルだけ `components/diary/CalendarDayLink.tsx`（`prefetch={active ? null : false}` の hover/touch プリフェッチ）に置換。月送り等のナビ `<Link>` は据え置き。
 - **`loading.tsx` は入れない**（`#33` で全ルートに追加したが `#36` で撤去）。サーバー応答が warm ~270ms と速いと、遷移のたびにスケルトンが「出てすぐ消える＝点滅」になり**チラつき**として体感される（実測: `/`→`/history` 遷移で `animate-pulse` が47個一斉表示）。`loading.tsx` 不在なら App Router は**遷移中は現在のページを表示したまま**、新ページ準備後に差し替えるのでチラつかない。cold（~780ms）時の無反応が気になるなら、全画面スケルトンではなく上部の細いプログレスバー等の控えめな手段を検討する。
-- クエリは**使う列だけ**。`/history` は `listEntryDates()`（entryDate のみ）、`/insights` の件数判定は `countDiaryEntries()`（`count(*)`）。`listDiaryEntries()`（本文全件）は AI 分析（`regenerateInsight`）が本文を使うので残す。
+- クエリは**使う列だけ**。`/history` は `listEntryDates()`（entryDate のみ）＋「さいきんの日記」用の `listRecentEntries(5)`（entryDate+content を 5 件に限定）、`/insights` の件数判定は `countDiaryEntries()`（`count(*)`）。`listDiaryEntries()`（本文全件）は AI 分析（`regenerateInsight`）が本文を使うので残す。
 - **誤検知に注意**: 「CSS 12 ファイル 251KB・圧縮未効き」は計測アーティファクト（Deployment Protection の SSO ゲート越し or dev ビルド）。実ビルドは 2 ファイル 167KB（gz 後約45KB）で minify＆圧縮済み。Vercel は静的アセットを自動で br/gzip 圧縮し `/_next/static/*` に `immutable` を付与する（手当て不要）。`lucide-react` も Next.js 16 の `optimizePackageImports` 既定対象（追加不要）。
 
 ## Vercel + npm 運用
@@ -81,12 +81,13 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 ## Gemini API（無料枠）
 - `gemini-2.5-flash` の free tier は **5 RPM (requests per minute)**。
 - 個人で試行錯誤するとすぐ 429 (`RESOURCE_EXHAUSTED`) に当たる。
-- 1 回の `regenerateInsight` で insight + MBTI を 2 リクエスト叩いていた時期があるが、1 リクエストに統合して緩和済み（`lib/ai/combined-insight.ts`）。
+- 1 回の `regenerateInsight` で insight + MBTI（当時。現在はエニアグラム親和度に置換）を 2 リクエスト叩いていた時期があるが、サマリー + アドバイス + エニアグラム9タイプ親和度の 1 リクエストに統合して緩和済み（`lib/ai/combined-insight.ts`）。
 - 429 catch 時は「1分ほど待ってから再試行」のメッセージを返す（`lib/actions/insight.ts` の `isRateLimitError`）。
 
 ## Tiptap（日記エディタ）
 - 入力 UI は Tiptap v3（`@tiptap/react` + `@tiptap/starter-kit` + 公式 `@tiptap/markdown`）。保存は従来通り Markdown 文字列。表示も同じ WYSIWYG（ひとひ刷新でプレビュータブと react-markdown は廃止）。
 - `@tiptap/core` / `@tiptap/pm` / `@tiptap/react` / `@tiptap/starter-kit` / `@tiptap/markdown` / `@tiptap/extensions` は **peer が exact pin**。6 つは常に同一バージョンに揃える。Dependabot 更新時もまとめて上げる（1 つだけ上がると実行時エラー）。
+  - 揃っているかの確認は package.json の range ではなく**解決結果**で行う（`npm ls @tiptap/core @tiptap/pm @tiptap/react @tiptap/starter-kit @tiptap/markdown @tiptap/extensions` か package-lock.json）。#63 で Dependabot group は lock を 6 つとも上げつつ package.json の range は 5 つしか更新せず、`@tiptap/extensions` だけ古い range が残った（lock 上は揃っていて実行時は無害）。
 - `useEditor` には必ず `immediatelyRender: false`（App Router の SSR エラー回避）。
 - エディタ設定は `lib/editor/diary-extensions.ts` に集約。見出しは H2/H3 のみ。
 - **プレースホルダーは公式 `Placeholder`（`@tiptap/extensions/placeholder`）を使う**。自前の絶対配置 overlay は H2/H3 でカーソルとサイズが不一致になり、リストでは重なるので廃止済み。空ブロックに付く `is-editor-empty` を CSS `::before` で描画（`app/globals.css`）。リストはトップレベルが textblock でないため既定設定で表示されない（重なり回避）。
@@ -96,6 +97,10 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 - このプロジェクトは shadcn の `base-nova` スタイル + **`@base-ui/react`**（Radix UI ではない）を使う。
 - `--primary` 等の CSS 変数は `oklch()` で定義されている。SVG / SVG 風コードで `var(--primary)` を直接使う。`hsl(var(--primary))` は無効。
 - `app/globals.css` の at-rule 順序: **`@import` 系を全部先に、`@plugin` 系を後ろに**。Biome の `noInvalidPositionAtImportRule` で hatching し、CSS 仕様にも合致する。
+
+## CSS グリッドの min-content はみ出し（#64・#65 で2回踏んだ）
+- グリッド子に nowrap の長文（日付＋抜粋の1行表示など）があると、`1fr` は暗黙の `minmax(auto,1fr)` のため **min-content までしか縮まず**親からはみ出す。
+- fr 指定は `grid-cols-[minmax(0,1fr)]` を使う。2カラム（#64）だけでなく**暗黙の1カラムグリッドでも起きる**（#65 で実測・再現）。
 
 ## フォント（next/font + 日本語/CJK）
 - **現行構成（2026-07 ひとひ刷新）**：本文・UI・見出しすべて**端末標準ゴシックのシステムフォントスタック**（**Webフォント0本**・転送ゼロ）。明朝 Noto Serif JP（PR #45/#46 で唯一残していた self-host）も退役し、`app/layout.tsx` から next/font は消えた。定義は `app/globals.css`（`--font-sans` / `--font-heading` / `--font-mono`。`--font-heading` は sans と同一リテラル＋base で `h1..h3 { font-weight:600; letter-spacing:.03em }`）。
@@ -122,14 +127,14 @@ Skip for: refactoring, debugging business logic, general programming concepts.
 - 既存パターンの拡張時は `lib/actions/diary.ts`, `lib/db/queries/diary.ts` の構造をコピーする。
 - `DEFAULT_USER_ID` という env / 定数は完全に廃止済み。grep で出てきたら削除対象。
 
-## MBTI 可視化の判断（M3）
-- 「カテゴリ的な対立軸（MBTI の E/I, S/N, T/F, J/P）」を「独立連続軸前提の Radar チャート」で可視化すると概念ズレが起きる。
-- **対立軸 → 対立スライダー**（自前 Tailwind 実装）、**独立連続量（Big Five 等）→ Radar**、という棲み分け。
-- Recharts は試したが M3 で削除済み。再導入する場合は本当に Radar が必要なケースに限る。
+## MBTI 可視化（M3）→ エニアグラムへ置換済み（#23）
+- **MBTI 機能は #23（2026-06-26）でエニアグラム9タイプ傾向に置換済み**。現行実装は `lib/enneagram/` + `lib/db/queries/enneagram.ts` + `components/insights/`（EnneagramTrends / EnneagramTopBars / MeterBar 等）、テーブルは `enneagram_snapshots`（旧 `mbti_snapshots` は移行なしで破棄）。
+- DB に旧 MBTI 形式（`{EI,SN,TF,JP}`）のスナップショット行が残り得るため、描画前に `lib/enneagram/types.ts` の `isEnneagramScores` ガードで弾いている。**このガードを外さない**。
+- 当時の学び: 「カテゴリ的な対立軸（MBTI の E/I など）」を「独立連続軸前提の Radar チャート」で可視化すると概念ズレが起きる。**対立軸 → 対立スライダー**、**独立連続量（エニアグラム親和度・Big Five 等）→ 棒グラフ/Radar** の棲み分け。Recharts は試したが M3 で削除済みで、再導入は本当に Radar が必要なケースに限る。
 
 ## 開発フロー（M5 以降: PR ベース）
 - **main へ直 push 不可**（ruleset で拒否される）。作業は必ずブランチで行い PR を作る。
-- PR 作成後、`gh pr checks --watch` で CI（lint / tsc / vitest / build）が green になるのを確認してから `gh pr merge --squash --delete-branch` でマージする。マージ方式は squash のみ。
+- PR 作成後、`gh pr checks --watch` で CI（lint / lint:design / tsc / vitest / build）が green になるのを確認してから `gh pr merge --squash --delete-branch` でマージする。マージ方式は squash のみ。
 - マージ後は `git checkout main && git pull` で追従する。
 - CI の build はダミー env（`.github/workflows/ci.yml` 参照）で走る。本物の secret を CI に追加しない。
 - main へのマージで Vercel が本番に auto-deploy する（M4 と同じ）。
